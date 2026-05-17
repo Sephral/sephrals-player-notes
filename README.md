@@ -4,6 +4,12 @@ Sephral’s Player Notes is a GM-only campaign memory and reminder tool for play
 
 It keeps private notes, secrets, promises, hooks, consequences, unresolved beats, and next-session reminders attached directly to player-facing Actors without replacing Foundry Journals or replacing existing Actor sheets.
 
+## Discord
+
+[![Join Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/7BjCgDYaBP)
+
+Questions, feedback, and module support are welcome on [Discord](https://discord.gg/7BjCgDYaBP).
+
 ## What the module is for
 
 Sephral’s Player Notes is designed for the kind of information that is easy for a GM to forget between sessions:
