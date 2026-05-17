@@ -1,0 +1,34 @@
+{
+  "id": "sephrals-player-notes",
+  "title": "Sephral’s Player Notes",
+  "description": "Keep private GM reminders, story hooks, secrets, promises, and next-session notes attached to player characters.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": 13,
+    "verified": "14.361"
+  },
+  "authors": [
+    {
+      "name": "Sephral"
+    }
+  ],
+  "url": "https://github.com/Sephral/sephrals-player-notes.git",
+  "esmodules": [
+    "scripts/spn-entry-20260517d.js"
+  ],
+  "styles": [
+    "styles/spn.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "lang/de.json"
+    }
+  ]
+}

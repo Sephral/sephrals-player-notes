@@ -1,0 +1,83 @@
+<div class="spn-app spn-actor-notes">
+  <header class="spn-actor-header">
+    <img src="{{actorImg}}" alt="{{actorName}}">
+    <div>
+      <h2>{{actorName}}</h2>
+      <div class="spn-note__meta">
+        <span class="spn-badge">{{counts.total}} {{spnLocalize "SPN.Import.NoteCount"}}</span>
+        <span class="spn-badge">{{counts.open}} {{spnLocalize "SPN.Status.Open"}}</span>
+        <span class="spn-badge">{{counts.nextSession}} {{spnLocalize "SPN.Status.NextSession"}}</span>
+      </div>
+    </div>
+    <div class="spn-inline-actions">
+      <button type="button" data-action="open-dashboard" title="{{spnLocalize "SPN.Tooltip.OpenDashboard"}}"><i class="fa-solid fa-table-columns"></i> {{spnLocalize "SPN.Button.Dashboard"}}</button>
+      <button type="button" data-action="create-note" title="{{spnLocalize "SPN.Tooltip.CreateNote"}}"><i class="fa-solid fa-plus"></i> {{spnLocalize "SPN.Button.Create"}}</button>
+    </div>
+  </header>
+
+  <div class="spn-filter-tabs">
+    {{#each tabs}}
+    <button type="button" class="spn-filter-tab {{#if this.active}}is-active{{/if}}" data-action="set-tab" data-tab="{{this.value}}" title="{{this.label}}">{{this.label}}</button>
+    {{/each}}
+  </div>
+
+  <section class="spn-toolbar">
+    <div class="spn-toolbar__filters">
+      <label>
+        <span>{{spnLocalize "SPN.Label.Search"}}</span>
+        <input type="search" name="search" value="{{filters.search}}" placeholder="{{spnLocalize "SPN.Label.Search"}}">
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.Tags"}}</span>
+        <select name="tagFilter">
+          {{#each tagOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.Priority"}}</span>
+        <select name="priorityFilter">
+          {{#each priorityOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+    </div>
+  </section>
+
+  {{#if notes.length}}
+  <div class="spn-note-list">
+    {{#each notes}}
+    <article class="spn-note">
+      <div class="spn-note__header">
+        <div>
+          <strong>{{this.title}}</strong>
+          <div class="spn-note__meta">
+            <span class="spn-status spn-status--{{this.statusClass}}">{{this.statusLabel}}</span>
+            <span class="spn-priority spn-priority--{{this.priorityClass}}">{{this.priorityLabel}}</span>
+            {{#each this.tags}}
+            <span class="spn-badge">{{this}}</span>
+            {{/each}}
+          </div>
+          <div class="spn-note__dates spn-muted">{{this.dateMetaLabel}}</div>
+        </div>
+        <div class="spn-note__actions">
+          <button type="button" data-action="edit-note" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.EditNote"}}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" data-action="resolve-note" data-note-id="{{this.id}}" title="{{this.resolveLabel}}"><i class="fa-solid {{this.resolveIcon}}"></i></button>
+          <button type="button" data-action="archive-note" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.ArchiveNote"}}"><i class="fa-solid fa-box-archive"></i></button>
+          <button type="button" data-action="duplicate-note" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.DuplicateNote"}}"><i class="fa-solid fa-copy"></i></button>
+          <button type="button" data-action="delete-note" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.DeleteNote"}}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="spn-note__body {{#if this.bodyCollapsible}}{{#unless this.bodyExpanded}}is-collapsed{{/unless}}{{/if}}" data-body-key="{{this.bodyKey}}">{{{this.enrichedBody}}}</div>
+      {{#if this.bodyCollapsible}}
+      <button type="button" class="spn-note__toggle" data-action="toggle-note-body" data-body-key="{{this.bodyKey}}">{{this.bodyToggleLabel}}</button>
+      {{/if}}
+    </article>
+    {{/each}}
+  </div>
+  {{else}}
+  <div class="spn-empty">{{spnLocalize "SPN.ActorNotes.Empty"}}</div>
+  {{/if}}
+</div>

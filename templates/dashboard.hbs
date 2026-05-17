@@ -1,0 +1,166 @@
+<div class="spn-app spn-dashboard" data-view="{{viewMode}}">
+  <section class="spn-toolbar">
+    <div class="spn-toolbar__filters">
+      <label>
+        <span>{{spnLocalize "SPN.Label.Search"}}</span>
+        <input type="search" name="search" value="{{filters.search}}" placeholder="{{spnLocalize "SPN.Label.Search"}}">
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.Status"}}</span>
+        <select name="statusFilter">
+          {{#each statusOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.Priority"}}</span>
+        <select name="priorityFilter">
+          {{#each priorityOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.Tags"}}</span>
+        <select name="tagFilter">
+          {{#each tagOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.ActorFilter"}}</span>
+        <select name="actorFilter">
+          {{#each actorOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+      <label>
+        <span>{{spnLocalize "SPN.Label.View"}}</span>
+        <select name="viewMode">
+          {{#each viewOptions}}
+          <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+          {{/each}}
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <div class="spn-dashboard__body">
+    <aside class="spn-sidebar">
+      <div class="spn-sidebar__list">
+        {{#each recoveryActorSummaries}}
+        <div class="spn-sidebar__actor {{#if this.active}}is-active{{/if}} {{#if this.hidden}}is-hidden{{/if}}" data-actor-uuid="{{this.actorUuid}}">
+          <img src="{{this.actorImg}}" alt="{{this.actorName}}">
+          <div>
+            <div><strong>{{this.actorName}}</strong></div>
+            <div class="spn-muted">{{this.counts.open}} {{spnLocalize "SPN.Status.Open"}} | {{this.counts.nextSession}} {{spnLocalize "SPN.Status.NextSession"}}{{#if this.hidden}} | {{spnLocalize "SPN.Button.Hidden"}}{{/if}}</div>
+          </div>
+          <div class="spn-inline-actions">
+            <span class="spn-badge">{{this.counts.total}}</span>
+            <button type="button" data-action="toggle-track" data-actor-uuid="{{this.actorUuid}}" data-hidden="{{this.hidden}}" title="{{#if this.hidden}}{{spnLocalize "SPN.Tooltip.ShowActor"}}{{else}}{{spnLocalize "SPN.Tooltip.HideActor"}}{{/if}}">{{#if this.hidden}}{{spnLocalize "SPN.Button.Show"}}{{else}}{{spnLocalize "SPN.Button.Hide"}}{{/if}}</button>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+      <div class="spn-sidebar__actions">
+        <button type="button" data-action="export-notes" title="{{spnLocalize "SPN.Tooltip.Export"}}"><i class="fa-solid fa-file-export"></i> {{spnLocalize "SPN.Button.Export"}}</button>
+        <button type="button" data-action="import-json" title="{{spnLocalize "SPN.Tooltip.ImportJson"}}"><i class="fa-solid fa-file-import"></i> {{spnLocalize "SPN.Button.Import"}}</button>
+        <button type="button" data-action="open-orphans" title="{{spnLocalize "SPN.Tooltip.Orphans"}}"><i class="fa-solid fa-link-slash"></i> {{spnLocalize "SPN.Button.Orphans"}} ({{orphanCount}})</button>
+      </div>
+    </aside>
+
+    <section class="spn-main">
+      {{#if groupedView}}
+        <div class="spn-note-list">
+          {{#each groupedActors}}
+          <section class="spn-note-group">
+            <div class="spn-note-group__header">
+              <img src="{{this.actorImg}}" alt="{{this.actorName}}" width="32" height="32">
+              <strong>{{this.actorName}}</strong>
+              <span class="spn-badge">{{this.counts.total}}</span>
+              <button type="button" data-action="open-actor" data-actor-uuid="{{this.actorUuid}}" title="{{spnLocalize "SPN.Tooltip.OpenActorNotes"}}">{{spnLocalize "SPN.Button.OpenActor"}}</button>
+              <button type="button" data-action="create-note" data-actor-uuid="{{this.actorUuid}}" title="{{spnLocalize "SPN.Tooltip.CreateNote"}}">{{spnLocalize "SPN.Button.Create"}}</button>
+            </div>
+            {{#if this.notes.length}}
+              {{#each this.notes}}
+              <article class="spn-note">
+                <div class="spn-note__header">
+                  <div>
+                    <strong>{{this.title}}</strong>
+                    <div class="spn-note__meta">
+                      <span class="spn-status spn-status--{{this.statusClass}}">{{this.statusLabel}}</span>
+                      <span class="spn-priority spn-priority--{{this.priorityClass}}">{{this.priorityLabel}}</span>
+                      {{#each this.tags}}
+                      <span class="spn-badge">{{this}}</span>
+                      {{/each}}
+                    </div>
+                    <div class="spn-note__dates spn-muted">{{this.dateMetaLabel}}</div>
+                  </div>
+                  <div class="spn-note__actions">
+                    <button type="button" data-action="edit-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.EditNote"}}"><i class="fa-solid fa-pen"></i></button>
+                    <button type="button" data-action="resolve-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{this.resolveLabel}}"><i class="fa-solid {{this.resolveIcon}}"></i></button>
+                    <button type="button" data-action="archive-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.ArchiveNote"}}"><i class="fa-solid fa-box-archive"></i></button>
+                    <button type="button" data-action="duplicate-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.DuplicateNote"}}"><i class="fa-solid fa-copy"></i></button>
+                    <button type="button" data-action="delete-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.DeleteNote"}}"><i class="fa-solid fa-trash"></i></button>
+                  </div>
+                </div>
+                <div class="spn-note__body {{#if this.bodyCollapsible}}{{#unless this.bodyExpanded}}is-collapsed{{/unless}}{{/if}}" data-body-key="{{this.bodyKey}}">{{{this.enrichedBody}}}</div>
+                {{#if this.bodyCollapsible}}
+                {{#unless @root.compactMode}}
+                <button type="button" class="spn-note__toggle" data-action="toggle-note-body" data-body-key="{{this.bodyKey}}">{{this.bodyToggleLabel}}</button>
+                {{/unless}}
+                {{/if}}
+              </article>
+              {{/each}}
+            {{else}}
+            <div class="spn-empty">{{spnLocalize "SPN.Label.NoNotes"}}</div>
+            {{/if}}
+          </section>
+          {{/each}}
+        </div>
+      {{else}}
+        {{#if flatNotes.length}}
+        <div class="spn-note-list">
+          {{#each flatNotes}}
+          <article class="spn-note">
+            <div class="spn-note__header">
+              <div>
+                <div class="spn-note__meta-secondary spn-muted">{{this.actorName}}</div>
+                <strong>{{this.title}}</strong>
+                <div class="spn-note__meta">
+                  <span class="spn-status spn-status--{{this.statusClass}}">{{this.statusLabel}}</span>
+                  <span class="spn-priority spn-priority--{{this.priorityClass}}">{{this.priorityLabel}}</span>
+                  {{#each this.tags}}
+                  <span class="spn-badge">{{this}}</span>
+                  {{/each}}
+                </div>
+                <div class="spn-note__dates spn-muted">{{this.dateMetaLabel}}</div>
+              </div>
+              <div class="spn-note__actions">
+                <button type="button" data-action="open-actor" data-actor-uuid="{{this.actorUuid}}" title="{{spnLocalize "SPN.Tooltip.OpenActorNotes"}}">{{spnLocalize "SPN.Button.OpenActor"}}</button>
+                <button type="button" data-action="edit-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.EditNote"}}"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" data-action="resolve-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{this.resolveLabel}}"><i class="fa-solid {{this.resolveIcon}}"></i></button>
+                <button type="button" data-action="archive-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.ArchiveNote"}}"><i class="fa-solid fa-box-archive"></i></button>
+                <button type="button" data-action="duplicate-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.DuplicateNote"}}"><i class="fa-solid fa-copy"></i></button>
+                <button type="button" data-action="delete-note" data-actor-uuid="{{this.actorUuid}}" data-note-id="{{this.id}}" title="{{spnLocalize "SPN.Tooltip.DeleteNote"}}"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="spn-note__body {{#if this.bodyCollapsible}}{{#unless this.bodyExpanded}}is-collapsed{{/unless}}{{/if}}" data-body-key="{{this.bodyKey}}">{{{this.enrichedBody}}}</div>
+            {{#if this.bodyCollapsible}}
+            {{#unless @root.compactMode}}
+            <button type="button" class="spn-note__toggle" data-action="toggle-note-body" data-body-key="{{this.bodyKey}}">{{this.bodyToggleLabel}}</button>
+            {{/unless}}
+            {{/if}}
+          </article>
+          {{/each}}
+        </div>
+        {{else}}
+        <div class="spn-empty">{{spnLocalize "SPN.Label.NoNotes"}}</div>
+        {{/if}}
+      {{/if}}
+    </section>
+  </div>
+</div>
