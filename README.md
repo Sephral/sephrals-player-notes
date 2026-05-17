@@ -34,7 +34,7 @@ It is intentionally not a generic note module for every document type.
 - Export notes as JSON or session prep as Markdown from one export dialog
 - Import notes with a preview and missing-Actor detection
 
-## Features in version 1
+## Features
 
 - GM-only notes attached to Actors
 - Statuses: Open, Next Session, Resolved, Archived
