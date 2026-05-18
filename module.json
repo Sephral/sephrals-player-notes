@@ -14,7 +14,7 @@
   ],
   "url": "https://github.com/Sephral/sephrals-player-notes.git",
   "esmodules": [
-    "scripts/spn-entry-20260517d.js"
+    "scripts/spn.js"
   ],
   "styles": [
     "styles/spn.css"
