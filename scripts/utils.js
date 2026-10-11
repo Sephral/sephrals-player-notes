@@ -26,11 +26,11 @@ function getConfiguredLanguage() {
   }
 }
 
-function getEffectiveModuleLanguage() {
+// Bundled translations only override Foundry's own when a language was picked explicitly,
+// so "Follow Foundry" keeps community translations from game.i18n.
+export function getOverrideLanguage() {
   const configured = getConfiguredLanguage();
-  if (configured && configured !== LANGUAGE_CHOICES.FOLLOW_FOUNDRY) return configured;
-  const foundryLanguage = String(game?.i18n?.lang ?? LANGUAGE_CHOICES.ENGLISH).toLowerCase();
-  return foundryLanguage.startsWith("de") ? LANGUAGE_CHOICES.GERMAN : LANGUAGE_CHOICES.ENGLISH;
+  return MODULE_LANGUAGE_CODES.includes(configured) ? configured : null;
 }
 
 export async function loadModuleTranslations() {
@@ -57,8 +57,9 @@ export function registerTemplateLocalization() {
 }
 
 export function localize(key) {
-  const language = getEffectiveModuleLanguage();
-  return moduleTranslations?.[language]?.[key] ?? game?.i18n?.localize?.(key) ?? key;
+  const language = getOverrideLanguage();
+  const override = language ? moduleTranslations?.[language]?.[key] : undefined;
+  return override ?? game?.i18n?.localize?.(key) ?? key;
 }
 
 export async function renderAppTemplate(path, context) {

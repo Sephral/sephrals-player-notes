@@ -14,11 +14,15 @@ export function setOpenDashboardHandler(handler) {
   openDashboardHandler = handler;
 }
 
-export class SPNSettingsMenu {
-  render(force, options) {
-    if (typeof openDashboardHandler === "function") openDashboardHandler();
-    return this;
-  }
+// registerMenu only accepts FormApplication or ApplicationV2 subclasses. This one opens the dashboard instead of
+// rendering a window of its own. It is created on demand because foundry is not loaded when the tests import this file.
+function createSettingsMenuClass() {
+  return class SPNSettingsMenu extends foundry.applications.api.ApplicationV2 {
+    async render() {
+      if (typeof openDashboardHandler === "function") openDashboardHandler();
+      return this;
+    }
+  };
 }
 
 export function registerSettings() {
@@ -144,7 +148,7 @@ export function registerSettings() {
       label: game.i18n.localize("SPN.Settings.Menu.Label"),
       hint: game.i18n.localize("SPN.Settings.Menu.Hint"),
       icon: "fa-solid fa-note-sticky",
-      type: SPNSettingsMenu,
+      type: createSettingsMenuClass(),
       restricted: true
     });
   } catch (error) {
