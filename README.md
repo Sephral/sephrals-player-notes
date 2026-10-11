@@ -4,6 +4,12 @@ Sephral’s Player Notes is a GM-only campaign memory and reminder tool for play
 
 It keeps private notes, secrets, promises, hooks, consequences, unresolved beats, and next-session reminders attached directly to player-facing Actors without replacing Foundry Journals or replacing existing Actor sheets.
 
+## Foundry VTT
+
+[![Foundry VTT package](https://img.shields.io/badge/Foundry%20VTT-Package%20page-fe6a1f?logo=foundryvirtualtabletop&logoColor=white)](https://foundryvtt.com/packages/sephrals-player-notes)
+
+Install the module from the package browser in Foundry VTT or open its [package page on foundryvtt.com](https://foundryvtt.com/packages/sephrals-player-notes).
+
 ## Discord
 
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/7BjCgDYaBP)
