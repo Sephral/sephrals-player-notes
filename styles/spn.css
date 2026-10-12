@@ -1,17 +1,55 @@
-.spn-app {
+/* Dark is the default. The light block below follows Foundry's light theme: the body class
+   for unthemed windows, or a window that carries its own "themed theme-light" classes. */
+.spn-app,
+.spn-dialog {
+  --spn-text: var(--color-text-light-highlight, #f2f2f2);
   --spn-border: rgba(255, 255, 255, 0.12);
+  --spn-divider: rgba(255, 255, 255, 0.08);
   --spn-muted: var(--color-text-light-6, #9aa4b2);
   --spn-surface: rgba(255, 255, 255, 0.04);
   --spn-surface-strong: rgba(255, 255, 255, 0.08);
+  --spn-surface-faint: rgba(255, 255, 255, 0.02);
   --spn-control-bg: #07070c;
   --spn-control-bg-focus: #0d0d17;
   --spn-control-border: rgba(214, 197, 170, 0.34);
   --spn-control-text: #f1e8d8;
+  --spn-control-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+  --spn-option-bg: #08080d;
+  --spn-placeholder: rgba(241, 232, 216, 0.48);
+  --spn-attention: #f3c39d;
+  --spn-alert: #ffb6be;
+  --spn-link: #9fc3ea;
+  --spn-check-bg: rgba(0, 0, 0, 0.22);
   --spn-accent: #6e9dcf;
   --spn-warning: #d06a4a;
   --spn-urgent: #b93d46;
   --spn-success: #4f8a5b;
-  color: var(--color-text-light-highlight, #f2f2f2);
+}
+
+body.theme-light .application:not(.themed) :is(.spn-app, .spn-dialog),
+.application.themed.theme-light :is(.spn-app, .spn-dialog) {
+  --spn-text: var(--color-text-primary, #191813);
+  --spn-border: rgba(0, 0, 0, 0.18);
+  --spn-divider: rgba(0, 0, 0, 0.12);
+  --spn-muted: var(--color-text-subtle, #5f5a50);
+  --spn-surface: rgba(0, 0, 0, 0.035);
+  --spn-surface-strong: rgba(0, 0, 0, 0.07);
+  --spn-surface-faint: rgba(0, 0, 0, 0.02);
+  --spn-control-bg: rgba(255, 255, 255, 0.75);
+  --spn-control-bg-focus: #ffffff;
+  --spn-control-border: rgba(0, 0, 0, 0.28);
+  --spn-control-text: var(--color-text-primary, #191813);
+  --spn-control-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  --spn-option-bg: #ffffff;
+  --spn-placeholder: rgba(0, 0, 0, 0.45);
+  --spn-attention: #9a3f17;
+  --spn-alert: #a01f2c;
+  --spn-link: #2b5d8f;
+  --spn-check-bg: rgba(0, 0, 0, 0.04);
+}
+
+.spn-app {
+  color: var(--spn-text);
   height: 100%;
   min-height: 0;
 }
@@ -80,9 +118,10 @@
   min-height: 26px;
 }
 
-.spn-toolbar input,
+/* Checkboxes and radios keep Foundry's own glyph styling, a box around them would draw a second square */
+.spn-toolbar input:not([type="checkbox"], [type="radio"]),
 .spn-toolbar select,
-.spn-dialog input,
+.spn-dialog input:not([type="checkbox"], [type="radio"]),
 .spn-dialog select,
 .spn-dialog textarea {
   width: 100%;
@@ -92,30 +131,30 @@
   color: var(--spn-control-text, #f1e8d8);
   min-height: 32px;
   padding: 0.35rem 0.55rem;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--spn-control-shadow);
 }
 
-.spn-toolbar input:focus,
+.spn-toolbar input:not([type="checkbox"], [type="radio"]):focus,
 .spn-toolbar select:focus,
-.spn-dialog input:focus,
+.spn-dialog input:not([type="checkbox"], [type="radio"]):focus,
 .spn-dialog select:focus,
 .spn-dialog textarea:focus {
   background: var(--spn-control-bg-focus, #0d0d17);
   border-color: rgba(178, 153, 221, 0.88);
-  box-shadow: 0 0 0 2px rgba(178, 153, 221, 0.26), inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 0 0 2px rgba(178, 153, 221, 0.26), var(--spn-control-shadow);
   outline: none;
 }
 
 .spn-toolbar select option,
 .spn-dialog select option {
-  background: #08080d;
-  color: #f1e8d8;
+  background: var(--spn-option-bg);
+  color: var(--spn-control-text);
 }
 
 .spn-toolbar input::placeholder,
 .spn-dialog input::placeholder,
 .spn-dialog textarea::placeholder {
-  color: rgba(241, 232, 216, 0.48);
+  color: var(--spn-placeholder);
 }
 
 .spn-dashboard__body {
@@ -209,12 +248,12 @@
 .spn-status--next-session,
 .spn-priority--high {
   border-color: rgba(208, 106, 74, 0.6);
-  color: #f3c39d;
+  color: var(--spn-attention);
 }
 
 .spn-priority--urgent {
   border-color: rgba(185, 61, 70, 0.7);
-  color: #ffb6be;
+  color: var(--spn-alert);
 }
 
 .spn-status--resolved,
@@ -249,7 +288,7 @@
   border: 1px solid var(--spn-border);
   border-radius: 8px;
   padding: 0.45rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--spn-surface-faint);
   flex: 0 0 auto;
 }
 
@@ -299,7 +338,7 @@
 .spn-note__body {
   margin-top: 0.5rem;
   padding-top: 0.4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--spn-divider);
   line-height: 1.38;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
@@ -323,7 +362,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #9fc3ea;
+  color: var(--spn-link);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 0.16em;
@@ -375,11 +414,6 @@
 }
 
 .spn-dialog {
-  --spn-muted: var(--color-text-light-6, #9aa4b2);
-  --spn-control-bg: #07070c;
-  --spn-control-bg-focus: #0d0d17;
-  --spn-control-border: rgba(214, 197, 170, 0.38);
-  --spn-control-text: #f1e8d8;
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -452,7 +486,7 @@
   padding: 0.35rem 0.45rem;
   border: 1px solid var(--spn-border);
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.22);
+  background: var(--spn-check-bg);
 }
 
 .spn-check-row > span {
@@ -462,9 +496,7 @@
 }
 
 .spn-check-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  min-height: 18px;
+  --checkbox-size: 18px;
   margin: 0;
 }
 
@@ -475,8 +507,16 @@
   bottom: 0;
   z-index: 2;
   background: rgba(7, 7, 12, 0.96);
-  border-top: 1px solid var(--spn-border);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding-top: 0.5rem;
+}
+
+body.theme-light .application:not(.themed):has(.spn-dialog--export) .form-footer,
+body.theme-light .application:not(.themed):has(.spn-dialog--export) .dialog-buttons,
+.application.themed.theme-light:has(.spn-dialog--export) .form-footer,
+.application.themed.theme-light:has(.spn-dialog--export) .dialog-buttons {
+  background: rgba(240, 235, 225, 0.97);
+  border-top-color: rgba(0, 0, 0, 0.18);
 }
 
 .spn-dialog textarea {
