@@ -1,110 +1,44 @@
 # Sephral’s Player Notes
 
-Sephral’s Player Notes is a GM-only campaign memory and reminder tool for player characters in Foundry VTT.
-
-It keeps private notes, secrets, promises, hooks, consequences, unresolved beats, and next-session reminders attached directly to player-facing Actors without replacing Foundry Journals or replacing existing Actor sheets.
-
-## Foundry VTT
+**The bard still owes the smith 50 gold. The rogue's sister is alive. You promised the paladin a scene of her own.** Player Notes keeps all of it right on the characters, so nothing slips through between sessions.
 
 [![Foundry VTT package](https://img.shields.io/badge/Foundry%20VTT-Package%20page-fe6a1f?logo=foundryvirtualtabletop&logoColor=white)](https://foundryvtt.com/packages/sephrals-player-notes)
-
-Install the module from the package browser in Foundry VTT or open its [package page on foundryvtt.com](https://foundryvtt.com/packages/sephrals-player-notes).
-
-## Discord
-
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/7BjCgDYaBP)
-
-Questions, feedback, and module support are welcome on [Discord](https://discord.gg/7BjCgDYaBP).
-
-## More modules
-
 [![More modules by Sephral](https://img.shields.io/badge/GitHub-More%20modules%20by%20Sephral-181717?logo=github&logoColor=white)](https://github.com/Sephral)
 
-More modules by Sephral for Foundry VTT are listed on [github.com/Sephral](https://github.com/Sephral).
+![Player Notes demo](media/demo.gif)
 
-## Demo
+## Highlights
 
-![SPN demo](media/demo.gif)
+* **Notes where they belong:** private GM notes on every player character, one click away from the sheet, the actor directory or the token HUD.
+* **Made for campaign memory:** story hooks, secrets, promises, debts, unresolved scenes and spotlight reminders.
+* **Know what is due:** statuses like *Open* and *Next Session*, priorities from *Low* to *Urgent* and tags of your own.
+* **One dashboard for the whole party:** filter by character, status, tag or priority, or switch to the session prep view before game night.
+* **Reminders at a glance:** the actor directory, and the tokens if you like, show who has urgent notes or notes for the next session.
+* **Session prep to go:** export your prep as Markdown or back up everything as JSON. Imports show a preview first.
 
-If the embedded preview is not available in your GitHub view, please check the media folder.
+## How it works
 
-## What the module is for
+1. Open a character's notes from the sheet header, the actor directory or the token HUD.
+2. Write the note and set a status and a priority.
+3. Before the next session, open the dashboard and see everything that is due.
 
-Sephral’s Player Notes is designed for the kind of information that is easy for a GM to forget between sessions:
+## Good to know
 
-- story hooks tied to one character
-- secrets the GM is holding back
-- promises, debts, and owed rewards
-- backstory details that should matter later
-- unresolved character scenes
-- spotlight reminders for upcoming sessions
-- next-session prep items for specific party members
+Players never see the notes in any window of the module. The notes are stored on the actor without encryption, though, so a player who knows the browser console could read them. Keep anything players must never find out somewhere else.
 
-It is intentionally not a generic note module for every document type.
+## Install
 
-## Core workflow
+Search for **Player Notes** in Foundry's module browser or open the [package page](https://foundryvtt.com/packages/sephrals-player-notes).
 
-- Open Player Notes from a supported Actor sheet header button
-- Open Player Notes from the Actor Directory context menu
-- Optionally open Player Notes from the Token HUD
-- Use the global Player Notes Dashboard to review all tracked campaign notes
-- Create notes from the dashboard, an Actor notes window, a selected token shortcut, or Actor sheet access
-- Export notes as JSON or session prep as Markdown from one export dialog
-- Import notes with a preview and missing-Actor detection
+Foundry VTT v13 and v14 · any game system · English and German
 
-## Features
+## Learn more
 
-- GM-only notes attached to Actors
-- Statuses: Open, Next Session, Resolved, Archived
-- Priorities: Low, Normal, High, Urgent
-- Built-in and custom tags
-- Actor-specific notes window with quick actions
-- Global dashboard with status, tag, priority, Actor, and text filters
-- Dashboard views for Actor grouping, detailed list review, compact scanning, and session prep
-- Actor Directory indicators for open and next-session notes
-- Optional token indicators for urgent or next-session notes
-- Selected-token note shortcut that opens the full Create Player Note editor
-- Import preview with missing Actor references and duplicate detection
-- Single export dialog for JSON export and Markdown session-prep export
-- Orphan note storage and cleanup support for deleted or missing Actors
-- Client-side window size persistence for the dashboard, Actor notes window, and module dialogs
-- API for macros and other modules to create, read, and update notes
+The [manual](MANUAL.md) covers every view of the dashboard, export and import, how notes are stored and the macro API.
 
-## Privacy
+Questions or ideas? Join us on [Discord](https://discord.gg/7BjCgDYaBP). Looking for more? See [all modules by Sephral](https://github.com/Sephral).
 
-- Only GMs can create, edit, archive, delete, import, or export notes.
-- The module hides GM notes from players in its interface.
-- The module does not send private note contents to chat, sockets, shared dialogs, or player-facing UI.
-- Notes are stored as flags on the Actor and are not encrypted. Foundry sends Actor data to every connected client, so a player who opens the browser console can read them. Do not keep secrets in notes that players must never see.
+## License
 
-## Storage model
-
-- Notes attached to existing Actors are stored on the Actor document as flags under scope `sephrals-player-notes`, flag key `notes`.
-- Each note stores its title, body, tags, status, priority, visibility, Actor UUID, creation timestamp/user, and last-change timestamp/user.
-- Supporting world data is stored in the world setting `sephrals-player-notes.worldState`. This setting stores manual Actor tracking modes, custom tags, and orphaned notes from deleted or missing Actors.
-- Client-only UI preferences, including saved window sizes, are stored in client settings such as `sephrals-player-notes.windowGeometry`.
-- Export payloads preserve Actor UUID references and add Actor name, image, and readable creator/updater names for easier review.
-- JSON and Markdown exports are downloaded by the browser when the GM explicitly uses the export dialog. The module does not store exports automatically.
-
-## API for macros and other modules
-
-GMs can work with notes from macros or other modules through `game.modules.get("sephrals-player-notes").api`. Each function takes an Actor, a Token, an Actor UUID, or the id of a world Actor. Calls from players throw an error.
-
-| Function | What it does |
-| --- | --- |
-| `createNote(actor, data)` | Creates a note. `data` can contain `title`, `body`, `tags`, `status`, `priority`, and `visibility`. Returns the new note. |
-| `getNotes(actor, { status })` | Returns the notes of the Actor. With `status`, only notes with that status are returned. |
-| `updateNote(actor, noteId, changes)` | Changes the same fields as `createNote`. Returns the updated note, or `null` if the Actor has no note with that id. |
-
-Valid statuses are `open`, `next-session`, `resolved`, and `archived`. Valid priorities are `low`, `normal`, `high`, and `urgent`. Visibility is `gm-only` or `player-visible`. Other values throw an error.
-
-```js
-const api = game.modules.get("sephrals-player-notes").api
-const actor = canvas.tokens.controlled[0]?.actor
-await api.createNote(actor, { title: "Owes the smith 50 gp", tags: ["debt"], status: "next-session", priority: "high" })
-```
-
-## Current limitations
-
-- The module enriches note text for Foundry links and readable formatting, but it does not try to replace Journals or become a full campaign wiki.
-- Token indicators are intentionally lightweight and GM-facing.
+See [LICENSE.md](LICENSE.md).
