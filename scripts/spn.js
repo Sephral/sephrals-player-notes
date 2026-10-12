@@ -19,6 +19,7 @@ import {
 import { promptQuickNoteForActors } from "./quick-note-dialog.js";
 import { registerSettings, getSetting, setOpenDashboardHandler } from "./settings.js";
 import {
+  actorChangeAffectsNotes,
   debugLog,
   getContextDocumentId,
   getSelectedTokenActors,
@@ -36,6 +37,11 @@ let reminderShown = false;
 const PLAYER_NOTES_CONTROL = 'playerNotes';
 const QUICK_NOTE_TOOL = 'quick-note';
 const DASHBOARD_TOOL = 'dashboard';
+const REFRESH_DEBOUNCE_MS = 150;
+const TOKEN_INDICATOR_STYLES = Object.freeze({
+  urgent: { fill: 0xb93d46, label: '!' },
+  nextSession: { fill: 0xd06a4a, label: 'N' }
+});
 
 function getActorFromSheet(app) {
   return app?.actor ?? app?.document ?? null;
@@ -131,6 +137,11 @@ async function refreshOpenApps() {
   canvas?.tokens?.placeables?.forEach((token) => updateTokenIndicator(token));
 }
 
+// Actor hooks arrive in bursts (several updates per combat turn, bulk imports), so they share one refresh.
+const scheduleRefreshOpenApps = foundry.utils.debounce(() => {
+  void refreshOpenApps();
+}, REFRESH_DEBOUNCE_MS);
+
 function createActorDirectoryContextOption() {
   return {
     name: localize("SPN.Directory.Context.Open"),
@@ -191,28 +202,25 @@ function injectActorDirectoryIndicators(app, html) {
   });
 }
 
-function updateTokenIndicator(token) {
-  const existing = token.spnIndicator;
-  if (existing) {
-    existing.removeChildren();
-    existing.visible = false;
-  }
-
-  if (!isGM() || !getSetting(SETTINGS.TOKEN_INDICATORS, true)) return;
-  if (!token?.actor) return;
+function getTokenIndicatorState(token) {
+  if (!isGM() || !getSetting(SETTINGS.TOKEN_INDICATORS, true)) return null;
+  if (!token?.actor) return null;
 
   const summary = getActorIndicatorSummary(token.actor);
-  if (!summary.hasTokenIndicator) return;
+  if (!summary.hasTokenIndicator) return null;
+  return summary.counts.urgent > 0 ? 'urgent' : 'nextSession';
+}
 
-  const container = existing ?? new PIXI.Container();
+function drawTokenBadge(container, state) {
+  const style = TOKEN_INDICATOR_STYLES[state];
   const badge = new PIXI.Graphics();
-  badge.beginFill(summary.counts.urgent > 0 ? 0xb93d46 : 0xd06a4a, 0.95);
+  badge.beginFill(style.fill, 0.95);
   badge.lineStyle(1, 0x111111, 0.9);
   badge.drawCircle(0, 0, 11);
   badge.endFill();
 
   const TextClass = foundry?.canvas?.containers?.PreciseText ?? globalThis.PIXI?.Text;
-  const text = new TextClass(summary.counts.urgent > 0 ? '!' : 'N', {
+  const text = new TextClass(style.label, {
     fill: 0xffffff,
     fontSize: 14,
     fontWeight: 'bold'
@@ -220,15 +228,39 @@ function updateTokenIndicator(token) {
   text.anchor?.set?.(0.5);
   container.addChild(badge);
   container.addChild(text);
-  container.position.set((token.w ?? token.document?.width ?? 1) - 10, 10);
-  container.eventMode = 'none';
-  container.visible = true;
-  container.name = 'spn-token-indicator';
+}
 
-  if (!existing) {
+// refreshToken fires on every incremental refresh, including each frame of a movement animation.
+// The badge is built once per token and only redrawn when its state changes.
+function updateTokenIndicator(token) {
+  let container = token?.spnIndicator ?? null;
+  if (container?.destroyed) {
+    container = null;
+    token.spnIndicator = null;
+  }
+
+  const state = getTokenIndicatorState(token);
+  if (!state) {
+    if (container) container.visible = false;
+    return;
+  }
+
+  if (!container) {
+    container = new PIXI.Container();
+    container.eventMode = 'none';
+    container.name = 'spn-token-indicator';
     token.addChild(container);
     token.spnIndicator = container;
   }
+
+  if (container.spnState !== state) {
+    container.removeChildren().forEach((child) => child.destroy({ children: true }));
+    drawTokenBadge(container, state);
+    container.spnState = state;
+  }
+
+  container.position.set((token.w ?? token.document?.width ?? 1) - 10, 10);
+  container.visible = true;
 }
 
 function injectTokenHudButton(_app, html, data) {
@@ -359,7 +391,10 @@ Hooks.once('init', () => {
     });
   });
 
-  Hooks.on('getActorDirectoryEntryContext', (_app, options) => {
+  // v13+ fires get<DocumentName>ContextOptions for the Actor Directory and for Actor compendium windows.
+  // Entries resolve through game.actors, so only the world directory gets them.
+  Hooks.on('getActorContextOptions', (app, options) => {
+    if (app?.collection !== game.actors) return;
     options.push(createActorDirectoryContextOption(), createTrackContextOption(), createHideContextOption());
   });
 
@@ -476,14 +511,19 @@ Hooks.once('ready', async () => {
   canvas?.tokens?.placeables?.forEach((token) => updateTokenIndicator(token));
 });
 
-Hooks.on('updateActor', () => {
-  void refreshOpenApps();
+Hooks.on('updateActor', (_actor, changes) => {
+  if (!isGM() || !actorChangeAffectsNotes(changes)) return;
+  scheduleRefreshOpenApps();
 });
 
 Hooks.on('createActor', () => {
-  void refreshOpenApps();
+  if (isGM()) scheduleRefreshOpenApps();
 });
 
+// deleteActor fires on every client. Only the active GM writes the orphan records, so they are stored once
+// and players never attempt the world setting write. Other GMs only refresh their windows.
 Hooks.on('deleteActor', (actor) => {
-  void stashActorNotesAsOrphans(actor).then(() => refreshOpenApps());
+  if (!isGM()) return;
+  const stashed = game.user.isActiveGM ? stashActorNotesAsOrphans(actor) : Promise.resolve();
+  void stashed.then(() => scheduleRefreshOpenApps());
 });

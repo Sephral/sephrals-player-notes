@@ -60,8 +60,9 @@ It is intentionally not a generic note module for every document type.
 ## Privacy
 
 - Only GMs can create, edit, archive, delete, import, or export notes.
-- Players do not see GM-only notes.
+- The module hides GM notes from players in its interface.
 - The module does not send private note contents to chat, sockets, shared dialogs, or player-facing UI.
+- Notes are stored as flags on the Actor and are not encrypted. Foundry sends Actor data to every connected client, so a player who opens the browser console can read them. Do not keep secrets in notes that players must never see.
 
 ## Storage model
 
@@ -70,7 +71,7 @@ It is intentionally not a generic note module for every document type.
 - Supporting world data is stored in the world setting `sephrals-player-notes.worldState`. This setting stores manual Actor tracking modes, custom tags, and orphaned notes from deleted or missing Actors.
 - Client-only UI preferences, including saved window sizes, are stored in client settings such as `sephrals-player-notes.windowGeometry`.
 - Export payloads preserve Actor UUID references and add Actor name, image, and readable creator/updater names for easier review.
-- JSON and Markdown exports are downloaded by the browser when the GM explicitly uses the export dialog; exports are not stored automatically by the module.
+- JSON and Markdown exports are downloaded by the browser when the GM explicitly uses the export dialog. The module does not store exports automatically.
 
 ## Current limitations
 

@@ -1,6 +1,6 @@
 import { DATA_VERSION, TRACKING_MODES } from "./constants.js";
 import { normalizeNote } from "./note-model.js";
-import { uniqueStrings } from "./utils.js";
+import { localizeWithFallback, uniqueStrings } from "./utils.js";
 
 export function defaultWorldState() {
   return {
@@ -24,7 +24,7 @@ export function normalizeOrphanRecord(record) {
   return {
     id: note.id,
     actorUuid: record.actorUuid ?? note.actorUuid,
-    actorName: String(record.actorName ?? record.note?.actorName ?? "Missing Actor"),
+    actorName: String(record.actorName ?? record.note?.actorName ?? localizeWithFallback("SPN.Orphans.MissingActor", "Missing Actor")),
     actorImg: String(record.actorImg ?? record.note?.actorImg ?? "icons/svg/mystery-man.svg"),
     orphanedAt: String(record.orphanedAt ?? note.updatedAt),
     note

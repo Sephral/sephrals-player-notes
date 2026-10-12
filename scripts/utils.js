@@ -12,6 +12,8 @@ import {
 
 const BUILTIN_TAG_MAP = new Map(BUILTIN_TAGS.map((entry) => [entry.value, entry.key]));
 const MODULE_LANGUAGE_CODES = [LANGUAGE_CHOICES.ENGLISH, LANGUAGE_CHOICES.GERMAN];
+// Actor fields the notes UI shows (name, image) or uses for player detection (ownership).
+const NOTES_ACTOR_FIELDS = Object.freeze(["name", "img", "ownership"]);
 
 let moduleTranslations = {};
 let translationsPromise = null;
@@ -60,6 +62,13 @@ export function localize(key) {
   const language = getOverrideLanguage();
   const override = language ? moduleTranslations?.[language]?.[key] : undefined;
   return override ?? game?.i18n?.localize?.(key) ?? key;
+}
+
+// For data helpers that also run in Node tests without Foundry, or before translations are loaded.
+// Both cases return the English fallback.
+export function localizeWithFallback(key, fallback) {
+  const text = globalThis.game?.i18n ? localize(key) : key;
+  return text && text !== key ? text : fallback;
 }
 
 export async function renderAppTemplate(path, context) {
@@ -241,6 +250,16 @@ export function getSelectedTokenActors() {
 export function getSingleSelectedActor() {
   const actors = getSelectedTokenActors();
   return actors.length === 1 ? actors[0] : null;
+}
+
+// updateActor fires for every HP or condition change. `changes` is the expanded diff of the update,
+// so only this module's flag scope (set, unset or removed) and the fields above need a refresh.
+export function actorChangeAffectsNotes(changes) {
+  if (!changes || typeof changes !== "object") return false;
+  if (NOTES_ACTOR_FIELDS.some((field) => Object.hasOwn(changes, field))) return true;
+  const flags = changes.flags;
+  if (!flags || typeof flags !== "object") return false;
+  return Object.hasOwn(flags, MODULE_ID) || Object.hasOwn(flags, `-=${MODULE_ID}`);
 }
 
 export function getContextDocumentId(target) {

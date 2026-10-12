@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { NOTE_PRIORITIES, NOTE_STATUSES, TRACKING_MODES } from "../scripts/constants.js";
 import { migrateActorNotes, migrateWorldState, normalizeOrphanRecord } from "../scripts/migration.js";
-import { createNoteData, duplicateSignature, normalizeNote, notesLikelyDuplicate } from "../scripts/note-model.js";
+import { createNoteData, duplicateNoteData, duplicateSignature, normalizeNote, notesLikelyDuplicate } from "../scripts/note-model.js";
 
 test("createNoteData applies defaults and normalizes tags", () => {
   const note = createNoteData({
@@ -20,6 +20,38 @@ test("createNoteData applies defaults and normalizes tags", () => {
   assert.deepEqual(note.tags, ["secret", "reward"]);
   assert.equal(note.createdAt, "2026-01-01T00:00:00.000Z");
   assert.equal(note.updatedBy, "gm-1");
+});
+
+test("untitled and copy titles fall back to English without Foundry", () => {
+  const note = createNoteData({ actorUuid: "Actor.test" });
+  assert.equal(note.title, "Untitled Note");
+
+  const copy = duplicateNoteData({ ...note, title: "Repay $& debt" }, { actorUuid: "Actor.test" });
+  assert.equal(copy.title, "Repay $& debt (Copy)");
+  assert.notEqual(copy.id, note.id);
+
+  assert.equal(normalizeOrphanRecord({ actorUuid: "Actor.gone", note: { id: "n1", title: "Hook" } }).actorName, "Missing Actor");
+});
+
+test("untitled, copy and missing actor texts use Foundry's translation", () => {
+  const translations = {
+    "SPN.Note.Untitled": "Unbenannte Notiz",
+    "SPN.Note.CopyTitle": "{title} (Kopie)",
+    "SPN.Orphans.MissingActor": "Fehlender Actor"
+  };
+  globalThis.game = { i18n: { localize: (key) => translations[key] ?? key } };
+  try {
+    const note = createNoteData({ actorUuid: "Actor.test", body: "  " });
+    assert.equal(note.title, "Unbenannte Notiz");
+    assert.equal(duplicateNoteData({ ...note, title: "Hook" }, { actorUuid: "Actor.test" }).title, "Hook (Kopie)");
+    assert.equal(normalizeOrphanRecord({ actorUuid: "Actor.gone", note: { id: "n1", title: "Hook" } }).actorName, "Fehlender Actor");
+
+    // Translations not loaded yet: Foundry returns the key, the model keeps the English text.
+    delete translations["SPN.Note.Untitled"];
+    assert.equal(createNoteData({ actorUuid: "Actor.test" }).title, "Untitled Note");
+  } finally {
+    delete globalThis.game;
+  }
 });
 
 test("notesLikelyDuplicate compares actor, title, and body", () => {

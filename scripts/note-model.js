@@ -3,7 +3,7 @@ import {
   NOTE_STATUSES,
   NOTE_VISIBILITY
 } from "./constants.js";
-import { isoNow, normalizeText, parseTagsInput, uniqueStrings } from "./utils.js";
+import { isoNow, localizeWithFallback, normalizeText, parseTagsInput, uniqueStrings } from "./utils.js";
 
 const VALID_STATUSES = new Set(Object.values(NOTE_STATUSES));
 const VALID_PRIORITIES = new Set(Object.values(NOTE_PRIORITIES));
@@ -22,7 +22,7 @@ export function normalizeNote(input = {}, options = {}) {
   const updatedAt = input.updatedAt || createdAt || now;
   const createdBy = input.createdBy || options.userId || null;
   const updatedBy = input.updatedBy || options.userId || createdBy;
-  const title = String(input.title ?? "").trim() || String(input.body ?? "").trim().split(/\n/)[0]?.slice(0, 72) || "Untitled Note";
+  const title = String(input.title ?? "").trim() || String(input.body ?? "").trim().split(/\n/)[0]?.slice(0, 72) || localizeWithFallback("SPN.Note.Untitled", "Untitled Note");
   const body = String(input.body ?? "").trim();
   const tags = uniqueStrings(parseTagsInput(input.tags));
   const status = VALID_STATUSES.has(input.status) ? input.status : (options.defaultStatus ?? NOTE_STATUSES.OPEN);
@@ -61,7 +61,7 @@ export function duplicateNoteData(note, options = {}) {
   return createNoteData({
     ...note,
     id: null,
-    title: `${note.title} (Copy)`,
+    title: localizeWithFallback("SPN.Note.CopyTitle", "{title} (Copy)").replaceAll("{title}", () => note.title),
     status: options.defaultStatus ?? note.status ?? NOTE_STATUSES.OPEN,
     createdAt: null,
     updatedAt: null,
