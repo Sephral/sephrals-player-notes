@@ -16,6 +16,18 @@ Install the module from the package browser in Foundry VTT or open its [package 
 
 Questions, feedback, and module support are welcome on [Discord](https://discord.gg/7BjCgDYaBP).
 
+## More modules
+
+[![More modules by Sephral](https://img.shields.io/badge/GitHub-More%20modules%20by%20Sephral-181717?logo=github&logoColor=white)](https://github.com/Sephral)
+
+More modules by Sephral for Foundry VTT are listed on [github.com/Sephral](https://github.com/Sephral).
+
+## Demo
+
+![SPN demo](media/demo.gif)
+
+If the embedded preview is not available in your GitHub view, please check the media folder.
+
 ## What the module is for
 
 Sephral’s Player Notes is designed for the kind of information that is easy for a GM to forget between sessions:
