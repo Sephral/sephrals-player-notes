@@ -2,7 +2,7 @@
   "id": "sephrals-player-notes",
   "title": "Sephral’s Player Notes",
   "description": "Keep private GM reminders, story hooks, secrets, promises, and next-session notes attached to player characters.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": {
     "minimum": 13,
     "verified": "14.369"
