@@ -110,6 +110,8 @@
   "SPN.Notification.ImportComplete": "Player-Notes-Import abgeschlossen.",
   "SPN.Notification.ExportReady": "Player-Notes-Export erstellt.",
   "SPN.Notification.LanguageChanged": "Player-Notes-Sprache aktualisiert.",
+  "SPN.Api.ActorNotFound": "Kein Actor gefunden fuer {actor}.",
+  "SPN.Api.InvalidValue": "Ungueltiger Wert fuer {field}: \"{value}\". Erlaubt: {allowed}.",
   "SPN.Dialog.Delete.Title": "Player Note loeschen",
   "SPN.Dialog.Delete.Content": "Diese Notiz endgueltig loeschen? Dies kann nicht rueckgaengig gemacht werden.",
   "SPN.Dialog.Editor.CreateTitle": "Player Note erstellen",

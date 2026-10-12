@@ -16,6 +16,7 @@ import {
   setActorTrackingMode,
   stashActorNotesAsOrphans
 } from "./note-repository.js";
+import { createNote, getNotes, updateNote } from "./notes-api.js";
 import { promptQuickNoteForActors } from "./quick-note-dialog.js";
 import { registerSettings, getSetting, setOpenDashboardHandler } from "./settings.js";
 import {
@@ -503,7 +504,10 @@ Hooks.once('ready', async () => {
       toggleDashboard,
       openActorNotes,
       quickNoteForSelectedTokens,
-      openOrphanCleanupDialog
+      openOrphanCleanupDialog,
+      createNote,
+      getNotes,
+      updateNote
     };
   }
 

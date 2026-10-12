@@ -110,6 +110,8 @@
   "SPN.Notification.ImportComplete": "Player Notes import completed.",
   "SPN.Notification.ExportReady": "Player Notes export created.",
   "SPN.Notification.LanguageChanged": "Player Notes language updated.",
+  "SPN.Api.ActorNotFound": "No Actor found for {actor}.",
+  "SPN.Api.InvalidValue": "Invalid {field} \"{value}\". Allowed: {allowed}.",
   "SPN.Dialog.Delete.Title": "Delete Player Note",
   "SPN.Dialog.Delete.Content": "Delete this note permanently? This cannot be undone.",
   "SPN.Dialog.Editor.CreateTitle": "Create Player Note",

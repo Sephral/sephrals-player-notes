@@ -56,6 +56,7 @@ It is intentionally not a generic note module for every document type.
 - Single export dialog for JSON export and Markdown session-prep export
 - Orphan note storage and cleanup support for deleted or missing Actors
 - Client-side window size persistence for the dashboard, Actor notes window, and module dialogs
+- API for macros and other modules to create, read, and update notes
 
 ## Privacy
 
@@ -72,6 +73,24 @@ It is intentionally not a generic note module for every document type.
 - Client-only UI preferences, including saved window sizes, are stored in client settings such as `sephrals-player-notes.windowGeometry`.
 - Export payloads preserve Actor UUID references and add Actor name, image, and readable creator/updater names for easier review.
 - JSON and Markdown exports are downloaded by the browser when the GM explicitly uses the export dialog. The module does not store exports automatically.
+
+## API for macros and other modules
+
+GMs can work with notes from macros or other modules through `game.modules.get("sephrals-player-notes").api`. Each function takes an Actor, a Token, an Actor UUID, or the id of a world Actor. Calls from players throw an error.
+
+| Function | What it does |
+| --- | --- |
+| `createNote(actor, data)` | Creates a note. `data` can contain `title`, `body`, `tags`, `status`, `priority`, and `visibility`. Returns the new note. |
+| `getNotes(actor, { status })` | Returns the notes of the Actor. With `status`, only notes with that status are returned. |
+| `updateNote(actor, noteId, changes)` | Changes the same fields as `createNote`. Returns the updated note, or `null` if the Actor has no note with that id. |
+
+Valid statuses are `open`, `next-session`, `resolved`, and `archived`. Valid priorities are `low`, `normal`, `high`, and `urgent`. Visibility is `gm-only` or `player-visible`. Other values throw an error.
+
+```js
+const api = game.modules.get("sephrals-player-notes").api
+const actor = canvas.tokens.controlled[0]?.actor
+await api.createNote(actor, { title: "Owes the smith 50 gp", tags: ["debt"], status: "next-session", priority: "high" })
+```
 
 ## Current limitations
 
