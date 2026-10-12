@@ -29,15 +29,15 @@ import {
   loadModuleTranslations,
   localize,
   registerTemplateLocalization,
-  resolveActorUuidSync
+  resolveActorUuidSync,
+  resolveElement
 } from "./utils.js";
 
 let dashboardApp = null;
 const actorApps = new Map();
 let reminderShown = false;
-const PLAYER_NOTES_CONTROL = 'playerNotes';
-const QUICK_NOTE_TOOL = 'quick-note';
-const DASHBOARD_TOOL = 'dashboard';
+const QUICK_NOTE_TOOL = 'spnQuickNote';
+const DASHBOARD_TOOL = 'spnDashboard';
 const REFRESH_DEBOUNCE_MS = 150;
 const TOKEN_INDICATOR_STYLES = Object.freeze({
   urgent: { fill: 0xb93d46, label: '!' },
@@ -182,10 +182,37 @@ function createHideContextOption() {
   };
 }
 
+// A labeled button below "Create Actor" opens the dashboard, so the module has an entry point that does not
+// depend on a token, a sheet or a context menu.
+function injectActorDirectoryButton(app, html) {
+  if (!isGM() || !getSetting(SETTINGS.ACTOR_DIRECTORY_BUTTON, true)) return;
+  if (app?.collection instanceof foundry.documents.collections.CompendiumCollection) return;
+  const root = resolveElement(html);
+  const header = root?.querySelector('.directory-header');
+  if (!header || header.querySelector('.spn-directory-actions')) return;
+
+  const row = document.createElement('div');
+  row.className = 'header-actions action-buttons flexrow spn-directory-actions';
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'spn-directory-button';
+  button.dataset.tooltip = localize('SPN.Tooltip.OpenDashboard');
+  button.innerHTML = `<i class="fa-solid fa-note-sticky" inert></i><span>${foundry.utils.escapeHTML(localize('SPN.Directory.Button'))}</span>`;
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    void openDashboard();
+  });
+  row.append(button);
+
+  const actions = header.querySelector('.header-actions');
+  if (actions) actions.after(row);
+  else header.prepend(row);
+}
+
 function injectActorDirectoryIndicators(app, html) {
   if (!isGM() || !getSetting(SETTINGS.ACTOR_DIRECTORY_INDICATORS, true)) return;
-  const root = html?.[0] ?? html;
-  if (!root?.querySelectorAll) return;
+  const root = resolveElement(html);
+  if (!root) return;
 
   root.querySelectorAll('[data-document-id], [data-entry-id]').forEach((entry) => {
     const actorId = entry.dataset.documentId || entry.dataset.entryId;
@@ -264,22 +291,25 @@ function updateTokenIndicator(token) {
   container.visible = true;
 }
 
-function injectTokenHudButton(_app, html, data) {
+// The Token HUD element is a <form>, see resolveElement.
+function injectTokenHudButton(app, html, data) {
   if (!isGM() || !getSetting(SETTINGS.TOKEN_INDICATORS, true)) return;
-  const actor = canvas?.tokens?.get(data._id)?.actor;
+  const actor = app?.actor ?? app?.object?.actor ?? canvas?.tokens?.get(data?._id)?.actor;
   if (!actor) return;
 
-  const root = html?.[0] ?? html;
-  if (!root?.querySelector) return;
+  const root = resolveElement(html);
+  if (!root) return;
   const left = root.querySelector('.col.left') ?? root;
   if (left.querySelector('.spn-hud-button')) return;
 
-  const button = document.createElement('div');
+  const button = document.createElement('button');
+  button.type = 'button';
   button.className = 'control-icon spn-hud-button';
-  button.dataset.action = 'spn-open-actor-notes';
-  button.innerHTML = '<i class="fa-solid fa-note-sticky"></i>';
-  button.title = localize('SPN.Directory.Context.Open');
-  button.addEventListener('click', () => {
+  button.innerHTML = '<i class="fa-solid fa-note-sticky" inert></i>';
+  button.dataset.tooltip = localize('SPN.Directory.Context.Open');
+  button.setAttribute('aria-label', localize('SPN.Directory.Context.Open'));
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
     void openActorNotes(actor);
   });
   left.append(button);
@@ -290,8 +320,8 @@ function injectActorSheetHeaderLink(app, html) {
   const actor = getActorFromSheet(app);
   if (!actor) return;
 
-  const contentRoot = html?.[0] ?? html;
-  const appElement = app?.element?.[0] ?? app?.element ?? null;
+  const contentRoot = resolveElement(html);
+  const appElement = resolveElement(app?.element);
   const windowRoot = appElement?.querySelector?.('.window-header') ? appElement : contentRoot?.closest?.('.window-app, .application') ?? contentRoot;
   const header = windowRoot?.querySelector?.('.window-header');
   if (!header || header.querySelector('.spn-actor-sheet-link, .spn-open-actor-notes')) return;
@@ -318,25 +348,6 @@ function injectActorSheetHeaderLink(app, html) {
 function scheduleActorSheetHeaderLink(app, html) {
   injectActorSheetHeaderLink(app, html);
   window.setTimeout(() => injectActorSheetHeaderLink(app, html), 50);
-}
-
-function installSceneControlClickFallback() {
-  const handlers = [
-    [`[data-control="${PLAYER_NOTES_CONTROL}"]`, QUICK_NOTE_TOOL, quickNoteForSelectedTokens],
-    [`[data-tool="${QUICK_NOTE_TOOL}"]`, QUICK_NOTE_TOOL, quickNoteForSelectedTokens],
-    [`[data-tool="${DASHBOARD_TOOL}"]`, DASHBOARD_TOOL, toggleDashboard]
-  ];
-
-  for (const [selector, key, handler] of handlers) {
-    const button = document.querySelector(selector);
-    if (!button || button.dataset.spnClickFallback === key) continue;
-    button.dataset.spnClickFallback = key;
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      void handler();
-    });
-  }
 }
 
 function registerKeybinding(action, data) {
@@ -393,58 +404,46 @@ Hooks.once('init', () => {
   });
 
   // v13+ fires get<DocumentName>ContextOptions for the Actor Directory and for Actor compendium windows.
-  // Entries resolve through game.actors, so only the world directory gets them.
+  // Entries resolve through game.actors, so compendium windows do not get them.
   Hooks.on('getActorContextOptions', (app, options) => {
-    if (app?.collection !== game.actors) return;
+    if (app?.collection instanceof foundry.documents.collections.CompendiumCollection) return;
     options.push(createActorDirectoryContextOption(), createTrackContextOption(), createHideContextOption());
   });
 
   Hooks.on('renderActorSheet', scheduleActorSheetHeaderLink);
   Hooks.on('renderActorSheetV2', scheduleActorSheetHeaderLink);
-  Hooks.on('renderActorDirectory', injectActorDirectoryIndicators);
+  Hooks.on('renderActorDirectory', (app, html) => {
+    injectActorDirectoryButton(app, html);
+    injectActorDirectoryIndicators(app, html);
+  });
   Hooks.on('renderTokenHUD', injectTokenHudButton);
 
+  // Button tools in the token controls. A control set of its own does not work: its active tool cannot be a
+  // button, because clicking the active tool does nothing.
   Hooks.on('getSceneControlButtons', (controls) => {
     if (!isGM()) return;
-    controls[PLAYER_NOTES_CONTROL] = {
-      name: PLAYER_NOTES_CONTROL,
+    const tokens = controls?.tokens;
+    if (!tokens?.tools) return;
+    const order = Object.keys(tokens.tools).length;
+    tokens.tools[DASHBOARD_TOOL] = {
+      name: DASHBOARD_TOOL,
+      title: localize('SPN.SceneTool.Dashboard'),
+      icon: 'fa-solid fa-note-sticky',
+      order,
+      button: true,
+      visible: true,
+      onChange: () => void toggleDashboard()
+    };
+    tokens.tools[QUICK_NOTE_TOOL] = {
+      name: QUICK_NOTE_TOOL,
       title: localize('SPN.SceneTool.QuickNote'),
       icon: 'fa-solid fa-bolt',
+      order: order + 1,
+      button: true,
       visible: true,
-      order: Object.keys(controls).length,
-      activeTool: QUICK_NOTE_TOOL,
-      onChange: (_event, active) => {
-        if (active) void quickNoteForSelectedTokens();
-      },
-      tools: {
-        [QUICK_NOTE_TOOL]: {
-          name: QUICK_NOTE_TOOL,
-          title: localize('SPN.SceneTool.QuickNote'),
-          icon: 'fa-solid fa-bolt',
-          order: 0,
-          button: true,
-          visible: true,
-          onChange: (_event, active) => {
-            if (active) void quickNoteForSelectedTokens();
-          }
-        },
-        [DASHBOARD_TOOL]: {
-          name: DASHBOARD_TOOL,
-          title: localize('SPN.SceneTool.Dashboard'),
-          icon: 'fa-solid fa-note-sticky',
-          order: 1,
-          button: true,
-          visible: true,
-          onChange: (_event, active) => {
-            if (active) void toggleDashboard();
-          }
-        }
-      }
+      onChange: () => void quickNoteForSelectedTokens()
     };
   });
-
-  Hooks.on('canvasReady', installSceneControlClickFallback);
-  Hooks.on('renderSceneControls', installSceneControlClickFallback);
 
   Hooks.on('refreshToken', (token) => {
     try {

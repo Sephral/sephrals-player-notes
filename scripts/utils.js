@@ -262,6 +262,15 @@ export function actorChangeAffectsNotes(changes) {
   return Object.hasOwn(flags, MODULE_ID) || Object.hasOwn(flags, `-=${MODULE_ID}`);
 }
 
+// Render hooks pass an HTMLElement since v13, older paths a jQuery object. A <form> is indexable as well
+// (form[0] is its first control, e.g. in the Token HUD and in sheets), so only jQuery objects are unwrapped.
+// nodeType instead of instanceof, because elements of a detached v14 window come from another realm.
+export function resolveElement(html) {
+  if (html?.nodeType === 1) return html;
+  const first = html?.jquery ? html[0] : null;
+  return first?.nodeType === 1 ? first : null;
+}
+
 export function getContextDocumentId(target) {
   const element = target?.closest ? target.closest("[data-document-id], [data-entry-id], [data-id]") : target;
   return element?.dataset?.documentId || element?.dataset?.entryId || element?.dataset?.id || null;

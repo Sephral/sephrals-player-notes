@@ -9,6 +9,7 @@ export const FLAG_KEYS = Object.freeze({
 
 export const SETTINGS = Object.freeze({
   WORLD_STATE: "worldState",
+  ACTOR_DIRECTORY_BUTTON: "actorDirectoryButton",
   ACTOR_DIRECTORY_INDICATORS: "actorDirectoryIndicators",
   TOKEN_INDICATORS: "tokenIndicators",
   ACTOR_SHEET_BUTTONS: "actorSheetButtons",

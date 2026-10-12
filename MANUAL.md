@@ -18,9 +18,11 @@ It is intentionally not a generic note module for every document type, and it do
 
 ## Core workflow
 
+* Open the dashboard with the Player Notes button in the Actor Directory, the Player Notes tool in the token controls, the shortcut Ctrl+Shift+N or the button in the module settings
 * Open Player Notes with the header button of a supported actor sheet
 * Open Player Notes from the context menu of the Actor Directory
-* Optionally open Player Notes from the Token HUD
+* Optionally open Player Notes from the Token HUD (needs the Token indicators setting)
+* Write a quick note for the selected token with the Quick Player Note tool in the token controls
 * Use the global Player Notes Dashboard to review all tracked campaign notes
 * Create notes from the dashboard, the notes window of an actor, the shortcut for a selected token or the actor sheet
 * Export notes as JSON or session prep as Markdown from one export dialog

@@ -33,6 +33,16 @@ export function registerSettings() {
     default: defaultWorldState()
   });
 
+  game.settings.register(MODULE_ID, SETTINGS.ACTOR_DIRECTORY_BUTTON, {
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    name: game.i18n.localize("SPN.Settings.ActorDirectoryButton.Name"),
+    hint: game.i18n.localize("SPN.Settings.ActorDirectoryButton.Hint"),
+    onChange: () => ui.actors?.render()
+  });
+
   game.settings.register(MODULE_ID, SETTINGS.ACTOR_DIRECTORY_INDICATORS, {
     scope: "world",
     config: true,
