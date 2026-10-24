@@ -22,7 +22,7 @@ import { getSetting } from "./settings.js";
 import { openOrphanCleanupDialog, promptExportNotes, promptImportNotes } from "./import-export.js";
 import { promptNoteEditor } from "./quick-note-dialog.js";
 import { PlayerActorNotesApp } from "./actor-notes-app.js";
-import { localize, renderAppTemplate, resolveActorUuidSync, tagOptions } from "./utils.js";
+import { addSettingsGear, localize, renderAppTemplate, resolveActorUuidSync, tagOptions } from "./utils.js";
 import { getSavedWindowPosition, observeApplicationGeometry } from "./window-state.js";
 
 const DASHBOARD_POSITION = { width: 980, height: 680 };
@@ -130,6 +130,12 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
 
   _replaceHTML(result, content) {
     content.innerHTML = result;
+  }
+
+  async _renderFrame(options) {
+    const frame = await super._renderFrame(options);
+    addSettingsGear(frame);
+    return frame;
   }
 
   async _onRender(context, options) {

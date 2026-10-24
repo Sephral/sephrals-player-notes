@@ -1,6 +1,8 @@
 export const MODULE_ID = "sephrals-player-notes";
 export const MODULE_TITLE = "Sephral’s Player Notes";
 export const DATA_VERSION = 1;
+// The Foundry version the module was verified against (see the self-test).
+export const TESTED_VERSIONS = Object.freeze({ core: "14.369" });
 export const EXPORT_FORMAT_VERSION = 1;
 
 export const FLAG_KEYS = Object.freeze({
@@ -19,7 +21,8 @@ export const SETTINGS = Object.freeze({
   DEFAULT_DASHBOARD_VIEW: "defaultDashboardView",
   SESSION_REMINDER_POPUP: "sessionReminderPopup",
   WINDOW_GEOMETRY: "windowGeometry",
-  LANGUAGE: "language"
+  LANGUAGE: "language",
+  ACKNOWLEDGED_VERSIONS: "acknowledgedVersions"
 });
 
 export const LANGUAGE_CHOICES = Object.freeze({

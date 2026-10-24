@@ -16,6 +16,19 @@ export function setOpenDashboardHandler(handler) {
 
 // registerMenu only accepts FormApplication or ApplicationV2 subclasses. This one opens the dashboard instead of
 // rendering a window of its own. It is created on demand because foundry is not loaded when the tests import this file.
+// The menu button which runs the self-test, built on demand like the dashboard shortcut.
+function createSelfTestMenuClass() {
+  return class SPNSelfTestMenu extends foundry.applications.api.ApplicationV2 {
+    async render() {
+      if (game.user?.isGM) {
+        const { runSelfTest } = await import("./selftest.js");
+        await runSelfTest();
+      }
+      return this;
+    }
+  };
+}
+
 function createSettingsMenuClass() {
   return class SPNSettingsMenu extends foundry.applications.api.ApplicationV2 {
     async render() {
@@ -145,6 +158,13 @@ export function registerSettings() {
     hint: game.i18n.localize("SPN.Settings.Popup.Hint")
   });
 
+  game.settings.register(MODULE_ID, SETTINGS.ACKNOWLEDGED_VERSIONS, {
+    scope: "client",
+    config: false,
+    type: String,
+    default: ""
+  });
+
   game.settings.register(MODULE_ID, SETTINGS.WINDOW_GEOMETRY, {
     scope: "client",
     config: false,
@@ -163,6 +183,19 @@ export function registerSettings() {
     });
   } catch (error) {
     console.warn(`${MODULE_ID} | Failed to register settings dashboard shortcut`, error);
+  }
+
+  try {
+    game.settings.registerMenu(MODULE_ID, "selfTest", {
+      name: game.i18n.localize("SPN.SelfTest.Title"),
+      label: game.i18n.localize("SPN.SelfTest.Run"),
+      hint: game.i18n.localize("SPN.SelfTest.Hint"),
+      icon: "fa-solid fa-stethoscope",
+      type: createSelfTestMenuClass(),
+      restricted: true
+    });
+  } catch (error) {
+    console.warn(`${MODULE_ID} | Failed to register the self-test`, error);
   }
 }
 

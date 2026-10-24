@@ -45,6 +45,8 @@ It is intentionally not a generic note module for every document type, and it do
 * Orphan storage and cleanup for notes of deleted or missing actors
 * Saved window sizes for the dashboard, the actor notes window and the module dialogs (per browser)
 * API for macros and other modules to create, read and update notes
+* A gear in the title bar of the dashboard and the notes window opens the module settings
+* A self test in the module settings checks the stored notes, the windows and the buttons. Run it after every Foundry update. When a newer Foundry than the tested one is installed, the GM gets a notice once
 
 Note text supports Foundry links and readable formatting. Token indicators are intentionally lightweight and only visible to the GM.
 
@@ -70,6 +72,7 @@ GMs can work with notes from macros or other modules through `game.modules.get("
 | `createNote(actor, data)` | Creates a note. `data` can contain `title`, `body`, `tags`, `status`, `priority` and `visibility`. Returns the new note. |
 | `getNotes(actor, { status })` | Returns the notes of the actor. With `status`, only notes with that status are returned. |
 | `updateNote(actor, noteId, changes)` | Changes the same fields as `createNote`. Returns the updated note, or `null` if the actor has no note with that id. |
+| `runSelfTest()` | Runs the self test and returns the problems it found. |
 
 Valid statuses are `open`, `next-session`, `resolved` and `archived`. Valid priorities are `low`, `normal`, `high` and `urgent`. Visibility is `gm-only` or `player-visible`. Other values throw an error.
 

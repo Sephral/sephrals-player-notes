@@ -9,7 +9,7 @@ import {
 } from "./note-repository.js";
 import { getSetting } from "./settings.js";
 import { promptNoteEditor } from "./quick-note-dialog.js";
-import { getActorImage, localize, prepareNoteForDisplay, renderAppTemplate, tagOptions } from "./utils.js";
+import { addSettingsGear, getActorImage, localize, prepareNoteForDisplay, renderAppTemplate, tagOptions } from "./utils.js";
 import { getSavedWindowPosition, observeApplicationGeometry } from "./window-state.js";
 
 const ACTOR_NOTES_POSITION = { width: 680, height: 620 };
@@ -114,6 +114,12 @@ export class PlayerActorNotesApp extends foundry.applications.api.ApplicationV2 
 
   _replaceHTML(result, content) {
     content.innerHTML = result;
+  }
+
+  async _renderFrame(options) {
+    const frame = await super._renderFrame(options);
+    addSettingsGear(frame);
+    return frame;
   }
 
   async _onRender(context, options) {

@@ -17,6 +17,7 @@ import {
   stashActorNotesAsOrphans
 } from "./note-repository.js";
 import { createNote, getNotes, updateNote } from "./notes-api.js";
+import { noticeNewVersions, runSelfTest } from "./selftest.js";
 import { promptQuickNoteForActors } from "./quick-note-dialog.js";
 import { registerSettings, getSetting, setOpenDashboardHandler } from "./settings.js";
 import {
@@ -506,9 +507,11 @@ Hooks.once('ready', async () => {
       openOrphanCleanupDialog,
       createNote,
       getNotes,
-      updateNote
+      updateNote,
+      runSelfTest
     };
   }
+  noticeNewVersions();
 
   await showSessionReminderPopup();
   canvas?.tokens?.placeables?.forEach((token) => updateTokenIndicator(token));

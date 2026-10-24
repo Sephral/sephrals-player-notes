@@ -1,5 +1,5 @@
 {
-  "SPN.ModuleTitle": "Sephral's Player Notes",
+  "SPN.ModuleTitle": "Sephral’s Player Notes",
   "SPN.Button.OpenShort": "Notes",
   "SPN.Button.Dashboard": "Dashboard",
   "SPN.Button.Create": "Create Note",
@@ -77,7 +77,7 @@
   "SPN.Tag.Item": "Item",
   "SPN.Tag.Location": "Location",
   "SPN.Tag.Custom": "Custom",
-  "SPN.Settings.Menu.Name": "Sephral's Player Notes",
+  "SPN.Settings.Menu.Name": "Sephral’s Player Notes",
   "SPN.Settings.Menu.Label": "Open Dashboard",
   "SPN.Settings.Menu.Hint": "Open the global Player Notes dashboard.",
   "SPN.Settings.ActorSheetButtons.Name": "Actor sheet header buttons",
@@ -172,5 +172,20 @@
   "SPN.Tooltip.ArchiveNote": "Archive this note.",
   "SPN.Tooltip.DuplicateNote": "Duplicate this note.",
   "SPN.Tooltip.DeleteNote": "Delete this note permanently.",
-  "SPN.Tooltip.ActorHeaderNotes": "Open Player Notes for this Actor. The number is currently open notes."
+  "SPN.Tooltip.ActorHeaderNotes": "Open Player Notes for this Actor. The number is currently open notes.",
+  "SPN.Tooltip.Settings": "Settings",
+  "SPN.SelfTest.Title": "Player Notes self test",
+  "SPN.SelfTest.Run": "Run self test",
+  "SPN.SelfTest.Hint": "Checks the stored notes, the windows and the buttons in the actor directory and the token controls. Run it after an update of Foundry.",
+  "SPN.SelfTest.Passed": "Self test passed: {checks} checks.",
+  "SPN.SelfTest.Problems": "Self test: {problems} of {checks} checks failed. See the chat message.",
+  "SPN.SelfTest.Version": "Foundry {current} (verified {tested})",
+  "SPN.SelfTest.NewVersions": "Player Notes was verified with an older Foundry than {versions}. Run the self test in the module settings to check that everything still works.",
+  "SPN.SelfTest.Texts": "The texts of the module are missing.",
+  "SPN.SelfTest.WorldState": "The notes of the world could not be read.",
+  "SPN.SelfTest.Templates": "The window templates of the module are missing.",
+  "SPN.SelfTest.Notes": "The notes of {name} could not be read.",
+  "SPN.SelfTest.Directory": "The notes button in the actor directory is missing.",
+  "SPN.SelfTest.Controls": "The notes tool in the token controls is missing.",
+  "SPN.SelfTest.NoCharacter": "No player character was found, so no character notes were checked."
 }

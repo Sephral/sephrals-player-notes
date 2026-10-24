@@ -31,7 +31,7 @@ Players never see the notes in any window of the module. The notes are stored on
 
 Search for **Player Notes** in Foundry's module browser or open the [package page](https://foundryvtt.com/packages/sephrals-player-notes).
 
-Foundry VTT v13 and v14 · any game system · English and German
+Foundry VTT 13 and 14 · any game system · English and German
 
 ## Learn more
 
