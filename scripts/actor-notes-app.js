@@ -9,6 +9,7 @@ import {
 } from "./note-repository.js";
 import { getSetting } from "./settings.js";
 import { promptNoteEditor } from "./quick-note-dialog.js";
+import { countFeature } from "./usage.mjs";
 import { addSettingsGear, getActorImage, localize, prepareNoteForDisplay, renderAppTemplate, tagOptions } from "./utils.js";
 import { getSavedWindowPosition, observeApplicationGeometry } from "./window-state.js";
 
@@ -182,6 +183,7 @@ export class PlayerActorNotesApp extends foundry.applications.api.ApplicationV2 
     root.querySelectorAll('[data-action="resolve-note"]').forEach((button) => {
       button.addEventListener("click", async () => {
         await toggleResolvedNoteForActor(this.actor, button.dataset.noteId);
+        countFeature(MODULE_ID, "noteResolve");
         await this.render();
       });
     });
@@ -189,6 +191,7 @@ export class PlayerActorNotesApp extends foundry.applications.api.ApplicationV2 
     root.querySelectorAll('[data-action="archive-note"]').forEach((button) => {
       button.addEventListener("click", async () => {
         await archiveNoteForActor(this.actor, button.dataset.noteId);
+        countFeature(MODULE_ID, "noteArchive");
         await this.render();
       });
     });

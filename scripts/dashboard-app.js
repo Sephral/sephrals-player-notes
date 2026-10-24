@@ -22,6 +22,7 @@ import { getSetting } from "./settings.js";
 import { openOrphanCleanupDialog, promptExportNotes, promptImportNotes } from "./import-export.js";
 import { promptNoteEditor } from "./quick-note-dialog.js";
 import { PlayerActorNotesApp } from "./actor-notes-app.js";
+import { countFeature } from "./usage.mjs";
 import { addSettingsGear, localize, renderAppTemplate, resolveActorUuidSync, tagOptions } from "./utils.js";
 import { getSavedWindowPosition, observeApplicationGeometry } from "./window-state.js";
 
@@ -222,6 +223,7 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
     root.querySelectorAll('[data-action="toggle-track"]').forEach((button) => {
       button.addEventListener("click", async () => {
         await setActorTrackingMode(button.dataset.actorUuid, button.dataset.hidden === "true" ? TRACKING_MODES.TRACKED : TRACKING_MODES.HIDDEN);
+        countFeature(MODULE_ID, "actorTracking");
         await this.render();
       });
     });
@@ -237,6 +239,7 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
         const actor = resolveActorUuidSync(button.dataset.actorUuid);
         if (!actor) return;
         await toggleResolvedNoteForActor(actor, button.dataset.noteId);
+        countFeature(MODULE_ID, "noteResolve");
         await this.render();
       });
     });
@@ -246,6 +249,7 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
         const actor = resolveActorUuidSync(button.dataset.actorUuid);
         if (!actor) return;
         await archiveNoteForActor(actor, button.dataset.noteId);
+        countFeature(MODULE_ID, "noteArchive");
         await this.render();
       });
     });

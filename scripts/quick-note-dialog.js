@@ -1,5 +1,6 @@
-import { NOTE_PRIORITIES, NOTE_STATUSES, NOTE_VISIBILITY } from "./constants.js";
+import { MODULE_ID, NOTE_PRIORITIES, NOTE_STATUSES, NOTE_VISIBILITY } from "./constants.js";
 import { createNoteForActor, getAvailableTags, updateNoteForActor } from "./note-repository.js";
+import { countFeature } from "./usage.mjs";
 import { format, formatDateTime, getSelectedTokenActors, getUserDisplayName, localize, parseTagsInput, tagOptions } from "./utils.js";
 import { getSavedWindowPosition, saveDialogGeometryFromButton } from "./window-state.js";
 
@@ -116,8 +117,14 @@ export async function promptNoteEditor({ actor, note = null, quick = false } = {
   });
 
   if (!response || response === "cancel") return null;
-  if (note) return updateNoteForActor(actor, note.id, response);
-  return createNoteForActor(actor, response);
+  if (note) {
+    const updated = await updateNoteForActor(actor, note.id, response);
+    if (updated) countFeature(MODULE_ID, "noteEdit");
+    return updated;
+  }
+  const created = await createNoteForActor(actor, response);
+  countFeature(MODULE_ID, "noteCreate");
+  return created;
 }
 
 export async function promptQuickNoteForActors(actors = null) {

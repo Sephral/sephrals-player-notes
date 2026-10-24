@@ -33,6 +33,7 @@ import {
   resolveActorUuidSync,
   resolveElement
 } from "./utils.js";
+import { countFeature, markUsed, registerUsage } from "./usage.mjs";
 
 let dashboardApp = null;
 const actorApps = new Map();
@@ -59,6 +60,7 @@ export async function openDashboard() {
     ui.notifications.warn(localize("SPN.Notification.GMOnly"));
     return null;
   }
+  markUsed(MODULE_ID);
 
   if (dashboardApp?.rendered) {
     await dashboardApp.render();
@@ -92,6 +94,7 @@ export async function openActorNotes(actor) {
     ui.notifications.warn(localize("SPN.Notification.NoActor"));
     return null;
   }
+  markUsed(MODULE_ID);
 
   const existing = actorApps.get(actor.uuid);
   if (existing?.rendered) {
@@ -125,7 +128,8 @@ async function quickNoteForSelectedTokens() {
     ui.notifications.warn(localize("SPN.Notification.NoToken"));
     return false;
   }
-  await promptQuickNoteForActors(actors);
+  const note = await promptQuickNoteForActors(actors);
+  if (note) countFeature(MODULE_ID, 'quickNote');
   await refreshOpenApps();
   return true;
 }
@@ -165,6 +169,7 @@ function createTrackContextOption() {
     callback: (target) => {
       const actor = getActorDirectoryEntry(target);
       if (!actor) return;
+      countFeature(MODULE_ID, 'actorTracking');
       void setActorTrackingMode(actor.uuid, TRACKING_MODES.TRACKED).then(() => refreshOpenApps());
     }
   };
@@ -178,6 +183,7 @@ function createHideContextOption() {
     callback: (target) => {
       const actor = getActorDirectoryEntry(target);
       if (!actor) return;
+      countFeature(MODULE_ID, 'actorTracking');
       void setActorTrackingMode(actor.uuid, TRACKING_MODES.HIDDEN).then(() => refreshOpenApps());
     }
   };
@@ -386,6 +392,10 @@ Hooks.once('init', () => {
   void loadModuleTranslations();
   registerSettings();
   setOpenDashboardHandler(openDashboard);
+  registerUsage(MODULE_ID, {
+    features: ['noteCreate', 'noteEdit', 'noteResolve', 'noteArchive', 'quickNote', 'notesExport', 'notesImport', 'actorTracking'],
+    settings: [SETTINGS.DEFAULT_DASHBOARD_VIEW, SETTINGS.TOKEN_INDICATORS, SETTINGS.SESSION_REMINDER_POPUP]
+  });
 
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (!isGM() || !getSetting(SETTINGS.ACTOR_SHEET_BUTTONS, true)) return;

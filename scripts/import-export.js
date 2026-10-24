@@ -19,6 +19,7 @@ import {
   deleteOrphanedNotes
 } from "./note-repository.js";
 import { duplicateSignature, normalizeNote, notesLikelyDuplicate } from "./note-model.js";
+import { countFeature } from "./usage.mjs";
 import {
   cloneData,
   downloadData,
@@ -247,6 +248,7 @@ export async function promptExportNotes(filteredActorUuids = null) {
   if (!response || response === "cancel") return null;
 
   const actorUuids = flattenActorSelection(response.scope, filteredActorUuids, response.selectedActorUuids);
+  countFeature(MODULE_ID, "notesExport");
   if (response.exportType === "markdown") return exportSessionPrepMarkdown({ actorUuids });
   return exportNotesJson({ actorUuids, statusFilter: response.statusFilter });
 }
@@ -493,6 +495,7 @@ export async function promptImportNotes() {
   const decision = await promptImportPreview(preview);
   if (!decision || decision === "cancel") return null;
   await applyImportPreview(preview, decision);
+  countFeature(MODULE_ID, "notesImport");
   return preview;
 }
 
