@@ -174,7 +174,7 @@
   "SPN.Tooltip.DeleteNote": "Löscht diese Notiz dauerhaft.",
   "SPN.Tooltip.ActorHeaderNotes": "Öffnet Player Notes für diesen Akteur. Die Zahl zeigt die offenen Notizen.",
   "SPN.Tooltip.Settings": "Einstellungen",
-  "SPN.SelfTest.Title": "Player Notes Selbsttest",
+  "SPN.SelfTest.Title": "Selbsttest von Player Notes",
   "SPN.SelfTest.Run": "Selbsttest starten",
   "SPN.SelfTest.Hint": "Prüft die gespeicherten Notizen, die Fenster und die Knöpfe im Akteursverzeichnis und in der Token Leiste. Nach jedem Update von Foundry ausführen.",
   "SPN.SelfTest.Passed": "Selbsttest bestanden: {checks} Prüfungen.",
