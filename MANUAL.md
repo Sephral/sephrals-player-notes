@@ -57,6 +57,19 @@ Note text supports Foundry links and readable formatting. Token indicators are i
 * The module never posts note contents to the chat or shows them in any window players see.
 * Notes are saved on the actor and are not encrypted. Foundry sends actor data to every connected client, so a player who opens the browser console can read them. Do not keep secrets in notes that players must never see.
 
+## Usage statistics
+
+The module can take part in a small usage report shared by all of Sephral’s modules. Nothing is counted or sent until the GM agrees: shortly after the world starts, the active GM is asked, and the question comes back at every start until there is an answer. The answer counts for all of Sephral’s modules in the world. *Share usage statistics* in the module settings turns the report on or off at any time, and *Manage statistics* below it shows what the report contains right now.
+
+With the GM’s consent only the active GM’s browser counts, and it sends at most one report a day. The question lists everything the report contains, from the Foundry version to a random world ID. For Player Notes it holds:
+
+* on how many of the last 30 days the module was used
+* how often notes are created, edited, resolved or archived, quick notes are taken for selected tokens, notes are exported or imported and characters are added to or hidden from the tracking
+* the settings *Default dashboard view*, *Token indicators* and *Session reminder popup* (only the chosen option)
+* where errors occur in the module code: file, line and error type, never the error message
+
+No names, chat messages, notes, dice results or other content of the world are sent.
+
 ## Export and import
 
 * JSON and Markdown exports are downloaded by your browser when you use the export dialog. Nothing is exported automatically.
