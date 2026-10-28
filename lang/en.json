@@ -187,5 +187,10 @@
   "SPN.SelfTest.Notes": "The notes of {name} could not be read.",
   "SPN.SelfTest.Directory": "The notes button in the actor directory is missing.",
   "SPN.SelfTest.Controls": "The notes tool in the token controls is missing.",
-  "SPN.SelfTest.NoCharacter": "No player character was found, so no character notes were checked."
+  "SPN.SelfTest.NoCharacter": "No player character was found, so no character notes were checked.",
+  "SPN.Debug.Title": "Debug file",
+  "SPN.Debug.Save": "Save debug file",
+  "SPN.Debug.Hint": "Saves one file for bug reports about all of Sephral’s modules in this world: versions, settings and what the modules recorded, such as the latest chat messages they read. It contains chat text and whispers, check it before you share it.",
+  "SPN.Debug.Entry": "Save Debug File (Sephral’s Modules)",
+  "SPN.Debug.Saved": "Debug file {file} saved. It contains chat text and whispers, check it before you share it."
 }

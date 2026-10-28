@@ -47,6 +47,7 @@ It is intentionally not a generic note module for every document type, and it do
 * API for macros and other modules to create, read and update notes
 * A gear in the title bar of the dashboard and the notes window opens the module settings
 * A self test in the module settings checks the stored notes, the windows and the buttons. Run it after every Foundry update. When a newer Foundry than the tested one is installed, the GM gets a notice once
+* *Save debug file* in the module settings saves a file for bug reports, see [Debug file](#debug-file)
 
 Note text supports Foundry links and readable formatting. Token indicators are intentionally lightweight and only visible to the GM.
 
@@ -56,6 +57,12 @@ Note text supports Foundry links and readable formatting. Token indicators are i
 * The module hides GM notes from players in its interface.
 * The module never posts note contents to the chat or shows them in any window players see.
 * Notes are saved on the actor and are not encrypted. Foundry sends actor data to every connected client, so a player who opens the browser console can read them. Do not keep secrets in notes that players must never see.
+
+## Debug file
+
+For bug reports, the GM saves one file about all of Sephral’s modules in this world: `Save debug file` in the module settings, or `Save Debug File (Sephral’s Modules)` in the context menu of a chat message. It holds the versions of Foundry, the system and the active modules, the settings of the modules and what they recorded, for Player Notes how many notes the characters have per status and visibility, the tracked characters, the custom tags and the orphaned notes, counted only. The text of the notes is left out. Macros call `game.modules.get("sephrals-player-notes").api.saveDebugFile()`.
+
+The file contains chat text and whispers. Check it before you share it.
 
 ## Usage statistics
 
@@ -86,6 +93,7 @@ GMs can work with notes from macros or other modules through `game.modules.get("
 | `getNotes(actor, { status })` | Returns the notes of the actor. With `status`, only notes with that status are returned. |
 | `updateNote(actor, noteId, changes)` | Changes the same fields as `createNote`. Returns the updated note, or `null` if the actor has no note with that id. |
 | `runSelfTest()` | Runs the self test and returns the problems it found. |
+| `saveDebugFile()` | Saves the debug file, see [Debug file](#debug-file). |
 
 Valid statuses are `open`, `next-session`, `resolved` and `archived`. Valid priorities are `low`, `normal`, `high` and `urgent`. Visibility is `gm-only` or `player-visible`. Other values throw an error.
 

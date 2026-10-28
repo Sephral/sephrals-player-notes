@@ -6,6 +6,8 @@ import {
   TRACKING_MODES
 } from "./constants.js";
 import { PlayerActorNotesApp } from "./actor-notes-app.js";
+import { registerDebug } from "./debug.js";
+import { saveDebugFile } from "./debug-file.mjs";
 import { PlayerNotesDashboardApp } from "./dashboard-app.js";
 import { openOrphanCleanupDialog } from "./import-export.js";
 import {
@@ -391,6 +393,7 @@ Hooks.once('init', () => {
   registerTemplateLocalization();
   void loadModuleTranslations();
   registerSettings();
+  registerDebug();
   setOpenDashboardHandler(openDashboard);
   registerUsage(MODULE_ID, {
     features: ['noteCreate', 'noteEdit', 'noteResolve', 'noteArchive', 'quickNote', 'notesExport', 'notesImport', 'actorTracking'],
@@ -518,7 +521,9 @@ Hooks.once('ready', async () => {
       createNote,
       getNotes,
       updateNote,
-      runSelfTest
+      runSelfTest,
+      // One file for all of Sephral's modules, without a message id about their latest picture
+      saveDebugFile: (messageId) => saveDebugFile(messageId ?? null, { moduleId: MODULE_ID })
     };
   }
   noticeNewVersions();

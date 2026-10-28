@@ -18,7 +18,7 @@ async function walk(directory) {
       continue;
     }
 
-    if (entry.isFile() && fullPath.endsWith(".js")) files.push(fullPath);
+    if (entry.isFile() && (fullPath.endsWith(".js") || fullPath.endsWith(".mjs"))) files.push(fullPath);
   }
 
   return files;

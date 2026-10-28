@@ -5,6 +5,7 @@ import {
   NOTE_STATUSES,
   SETTINGS
 } from "./constants.js";
+import { registerDebugMenu } from "./debug-file.mjs";
 import { defaultWorldState } from "./migration.js";
 import { localize } from "./utils.js";
 
@@ -197,6 +198,12 @@ export function registerSettings() {
   } catch (error) {
     console.warn(`${MODULE_ID} | Failed to register the self-test`, error);
   }
+
+  registerDebugMenu(MODULE_ID, {
+    name: game.i18n.localize("SPN.Debug.Title"),
+    label: game.i18n.localize("SPN.Debug.Save"),
+    hint: game.i18n.localize("SPN.Debug.Hint")
+  });
 }
 
 export function getSetting(key, fallback = null) {

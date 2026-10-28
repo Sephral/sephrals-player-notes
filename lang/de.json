@@ -187,5 +187,10 @@
   "SPN.SelfTest.Notes": "Die Notizen von {name} ließen sich nicht lesen.",
   "SPN.SelfTest.Directory": "Der Notizen Knopf im Akteursverzeichnis fehlt.",
   "SPN.SelfTest.Controls": "Das Notizen Werkzeug in der Token Leiste fehlt.",
-  "SPN.SelfTest.NoCharacter": "Kein Spielercharakter gefunden, daher wurden keine Charakternotizen geprüft."
+  "SPN.SelfTest.NoCharacter": "Kein Spielercharakter gefunden, daher wurden keine Charakternotizen geprüft.",
+  "SPN.Debug.Title": "Debug-Datei",
+  "SPN.Debug.Save": "Debug-Datei speichern",
+  "SPN.Debug.Hint": "Speichert eine Datei für Fehlerberichte über alle Module von Sephral in dieser Welt: Versionen, Einstellungen und was die Module aufgezeichnet haben, etwa die letzten Chatnachrichten, die sie gelesen haben. Sie enthält Chattext und Flüsternachrichten, prüfe sie vor dem Teilen.",
+  "SPN.Debug.Entry": "Debug-Datei speichern (Sephral’s Module)",
+  "SPN.Debug.Saved": "Debug-Datei {file} gespeichert. Sie enthält Chattext und Flüsternachrichten, prüfe sie vor dem Teilen."
 }
