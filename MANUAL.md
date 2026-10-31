@@ -58,11 +58,29 @@ Note text supports Foundry links and readable formatting. Token indicators are i
 * The module never posts note contents to the chat or shows them in any window players see.
 * Notes are saved on the actor and are not encrypted. Foundry sends actor data to every connected client, so a player who opens the browser console can read them. Do not keep secrets in notes that players must never see.
 
+## Settings
+
+* *Sephral’s Modules* opens the window for all of Sephral’s modules in the world, see [Sephral’s Modules](#sephrals-modules).
+* *Sephral’s Player Notes* opens the dashboard.
+* *Run self test* checks the stored notes, the windows and the buttons.
+* *Save debug file* saves a file for bug reports, see [Debug file](#debug-file).
+* *Actor Directory button*, *Actor Directory indicators*, *Token indicators* and *Actor sheet header buttons* switch the buttons and indicators the GM sees. Token indicators also enable the shortcut in the Token HUD. World settings, all on by default.
+* *Default note status* is the status of new notes. World setting, *Open* by default.
+* *Hide archived by default* keeps archived notes out of the dashboard and the notes windows until you show them. Personal setting, on by default.
+* *Default dashboard view* is the view the dashboard opens with. Personal setting.
+* *Session reminder popup* shows the notes for the next session in a small window when the world opens. Personal setting, off by default.
+* *Module language* follows Foundry or uses English or German. Personal setting.
+* *Debug mode* writes details about checks, imports and cleanups to the browser console. Personal setting, off by default.
+
 ## Debug file
 
 For bug reports, the GM saves one file about all of Sephral’s modules in this world: `Save debug file` in the module settings, or `Save Debug File (Sephral’s Modules)` in the context menu of a chat message. It holds the versions of Foundry, the system and the active modules, the settings of the modules and what they recorded, for Player Notes how many notes the characters have per status and visibility, the tracked characters, the custom tags and the orphaned notes, counted only. The text of the notes is left out. Macros call `game.modules.get("sephrals-player-notes").api.saveDebugFile()`.
 
 The file contains chat text and whispers. Check it before you share it.
+
+## Sephral’s Modules
+
+The first button in the module settings, *Sephral’s Modules* (GMs only), opens one window for all of Sephral's modules in the world: the version, self test, settings, manual and demo video of each, a button that switches on an installed module that is off (Foundry then reloads the world for everyone), and the debug file. Below, *More from Sephral* lists other modules that fit the game system of the world, shown only after a click, each with its demo video. The list is part of the module. Only a video you start is loaded, from the module page on GitHub.
 
 ## Usage statistics
 

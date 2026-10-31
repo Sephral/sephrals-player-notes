@@ -11,15 +11,8 @@ const moduleJsonPath = path.join(rootDir, "module.json");
 const releaseRoot = path.join(rootDir, ".release");
 const packageDir = path.join(releaseRoot, "package");
 
-const filesToCopy = [
-  "LICENSE.md",
-  "MANUAL.md",
-  "README.md",
-  "lang",
-  "scripts",
-  "styles",
-  "templates"
-];
+const optionalEntries = ["templates"];
+const requiredEntries = ["LICENSE.md", "MANUAL.md", "README.md", "lang", "scripts", "styles"];
 
 async function pathExists(relativePath) {
   try {
@@ -35,7 +28,10 @@ function getRepositorySlug(moduleManifest) {
 
   const repositoryUrl = String(moduleManifest.url ?? "").trim();
   const match = repositoryUrl.match(/github\.com\/([^/]+\/[^/.]+)(?:\.git)?$/i);
-  if (!match) throw new Error("Could not determine the GitHub repository slug from module.json url.");
+  if (!match) {
+    throw new Error("Could not determine the GitHub repository slug from module.json url.");
+  }
+
   return match[1];
 }
 
@@ -53,9 +49,14 @@ if (!moduleId) throw new Error("module.json is missing an id.");
 await rm(releaseRoot, { recursive: true, force: true });
 await mkdir(packageDir, { recursive: true });
 
-for (const entry of filesToCopy) {
-  if (!await pathExists(entry)) continue;
+for (const entry of requiredEntries) {
   await cp(path.join(rootDir, entry), path.join(packageDir, entry), { recursive: true });
+}
+
+for (const entry of optionalEntries) {
+  if (await pathExists(entry)) {
+    await cp(path.join(rootDir, entry), path.join(packageDir, entry), { recursive: true });
+  }
 }
 
 const releaseManifest = {

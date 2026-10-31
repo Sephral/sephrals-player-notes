@@ -3,11 +3,13 @@ import {
   MODULE_ID,
   NOTE_STATUSES,
   SETTINGS,
+  TESTED_VERSIONS,
   TRACKING_MODES
 } from "./constants.js";
 import { PlayerActorNotesApp } from "./actor-notes-app.js";
 import { registerDebug } from "./debug.js";
 import { saveDebugFile } from "./debug-file.mjs";
+import { registerHubModule } from "./hub.mjs";
 import { PlayerNotesDashboardApp } from "./dashboard-app.js";
 import { openOrphanCleanupDialog } from "./import-export.js";
 import {
@@ -390,6 +392,7 @@ async function showSessionReminderPopup() {
 }
 
 Hooks.once('init', () => {
+  registerHubModule({ moduleId: MODULE_ID, tested: TESTED_VERSIONS });
   registerTemplateLocalization();
   void loadModuleTranslations();
   registerSettings();
