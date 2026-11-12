@@ -91,7 +91,7 @@ With the GM’s consent only the active GM’s browser counts, and it sends at m
 * on how many of the last 30 days the module was used
 * how often notes are created, edited, resolved or archived, quick notes are taken for selected tokens, notes are exported or imported and characters are added to or hidden from the tracking
 * the settings *Default dashboard view*, *Token indicators* and *Session reminder popup* (only the chosen option)
-* where errors occur in the module code: file, line and error type, never the error message
+* where errors occur in the module code: file, line, error type and whether the error arose in the module itself, in Foundry, in the game system or in another module, never the error message or the name of another module
 
 No names, chat messages, notes, dice results or other content of the world are sent.
 
