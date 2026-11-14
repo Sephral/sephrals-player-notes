@@ -19,7 +19,7 @@
 
 ## How it works
 
-1. Open a character's notes from the sheet header, the actor directory or the token HUD.
+1. Open a character's notes from the sheet menu, the actor directory or the token HUD.
 2. Write the note and set a status and a priority.
 3. Before the next session, open the dashboard and see everything that is due.
 

@@ -19,9 +19,9 @@ It is intentionally not a generic note module for every document type, and it do
 ## Core workflow
 
 * Open the dashboard with the Player Notes button in the Actor Directory, the Player Notes tool in the token controls, the shortcut Ctrl+Shift+N or the button in the module settings
-* Open Player Notes with the header button of a supported actor sheet
+* Open Player Notes from the window menu (the three dots) of an actor sheet, the entry shows the number of open notes
 * Open Player Notes from the context menu of the Actor Directory
-* Optionally open Player Notes from the Token HUD (needs the Token indicators setting)
+* Optionally open Player Notes from the Token HUD (setting *Token HUD button*)
 * Write a quick note for the selected token with the Quick Player Note tool in the token controls
 * Use the global Player Notes Dashboard to review all tracked campaign notes
 * Create notes from the dashboard, the notes window of an actor, the shortcut for a selected token or the actor sheet
@@ -64,7 +64,7 @@ Note text supports Foundry links and readable formatting. Token indicators are i
 * *Sephral’s Player Notes* opens the dashboard.
 * *Run self test* checks the stored notes, the windows and the buttons.
 * *Save debug file* saves a file for bug reports, see [Debug file](#debug-file).
-* *Actor Directory button*, *Actor Directory indicators*, *Token indicators* and *Actor sheet header buttons* switch the buttons and indicators the GM sees. Token indicators also enable the shortcut in the Token HUD. World settings, all on by default.
+* *Actor Directory button*, *Actor Directory indicators*, *Token indicators*, *Token HUD button* and *Actor sheet header buttons* switch the buttons and indicators the GM sees. The Token HUD button has its own setting. A world that had switched the token indicators off keeps the HUD button off after the update. *Actor sheet header buttons* controls the Player Notes entry in the sheet's window menu. World settings, all on by default.
 * *Default note status* is the status of new notes. World setting, *Open* by default.
 * *Hide archived by default* keeps archived notes out of the dashboard and the notes windows until you show them. Personal setting, on by default.
 * *Default dashboard view* is the view the dashboard opens with. Personal setting.

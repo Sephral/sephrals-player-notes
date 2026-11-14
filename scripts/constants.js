@@ -14,6 +14,7 @@ export const SETTINGS = Object.freeze({
   ACTOR_DIRECTORY_BUTTON: "actorDirectoryButton",
   ACTOR_DIRECTORY_INDICATORS: "actorDirectoryIndicators",
   TOKEN_INDICATORS: "tokenIndicators",
+  TOKEN_HUD_BUTTON: "tokenHudButton",
   ACTOR_SHEET_BUTTONS: "actorSheetButtons",
   DEFAULT_STATUS: "defaultNoteStatus",
   HIDE_ARCHIVED: "hideArchivedByDefault",

@@ -23,7 +23,8 @@ import {
 import { createNote, getNotes, updateNote } from "./notes-api.js";
 import { noticeNewVersions, runSelfTest } from "./selftest.js";
 import { promptQuickNoteForActors } from "./quick-note-dialog.js";
-import { registerSettings, getSetting, setOpenDashboardHandler } from "./settings.js";
+import { BADGE_RADIUS, drawBadgeCircle } from "./token-badge.js";
+import { registerSettings, getSetting, migrateHudButtonSetting, setOpenDashboardHandler } from "./settings.js";
 import {
   actorChangeAffectsNotes,
   debugLog,
@@ -44,6 +45,7 @@ const actorApps = new Map();
 let reminderShown = false;
 const QUICK_NOTE_TOOL = 'spnQuickNote';
 const DASHBOARD_TOOL = 'spnDashboard';
+const HEADER_CONTROL_ACTION = 'spnOpenNotes';
 const REFRESH_DEBOUNCE_MS = 150;
 const TOKEN_INDICATOR_STYLES = Object.freeze({
   urgent: { fill: 0xb93d46, label: '!' },
@@ -152,45 +154,54 @@ const scheduleRefreshOpenApps = foundry.utils.debounce(() => {
   void refreshOpenApps();
 }, REFRESH_DEBOUNCE_MS);
 
-function createActorDirectoryContextOption() {
-  return {
-    name: localize("SPN.Directory.Context.Open"),
-    icon: '<i class="fa-solid fa-note-sticky"></i>',
-    condition: () => game.user.isGM,
-    callback: (target) => {
-      const actor = getActorDirectoryEntry(target);
-      if (!actor) return;
-      void openActorNotes(actor);
-    }
+// One entry with both key sets: v13 reads name, condition and callback(li), v14 reads label, visible and onClick(event, li)
+// and logs a deprecation warning for the old keys unless the new ones are there too. The icon is HTML, which both accept.
+function createContextOption({ key, icon, run }) {
+  const label = localize(key);
+  const visible = () => game.user.isGM;
+  const action = (target) => {
+    const actor = getActorDirectoryEntry(target);
+    if (actor) run(actor);
   };
+  return {
+    name: label,
+    label,
+    icon: `<i class="fa-solid ${icon}"></i>`,
+    condition: visible,
+    visible,
+    callback: (target) => action(target),
+    onClick: (_event, target) => action(target)
+  };
+}
+
+function createActorDirectoryContextOption() {
+  return createContextOption({
+    key: "SPN.Directory.Context.Open",
+    icon: "fa-note-sticky",
+    run: (actor) => void openActorNotes(actor)
+  });
 }
 
 function createTrackContextOption() {
-  return {
-    name: localize("SPN.Directory.Context.Track"),
-    icon: '<i class="fa-solid fa-thumbtack"></i>',
-    condition: () => game.user.isGM,
-    callback: (target) => {
-      const actor = getActorDirectoryEntry(target);
-      if (!actor) return;
+  return createContextOption({
+    key: "SPN.Directory.Context.Track",
+    icon: "fa-thumbtack",
+    run: (actor) => {
       countFeature(MODULE_ID, 'actorTracking');
       void setActorTrackingMode(actor.uuid, TRACKING_MODES.TRACKED).then(() => refreshOpenApps());
     }
-  };
+  });
 }
 
 function createHideContextOption() {
-  return {
-    name: localize("SPN.Directory.Context.Hide"),
-    icon: '<i class="fa-solid fa-eye-slash"></i>',
-    condition: () => game.user.isGM,
-    callback: (target) => {
-      const actor = getActorDirectoryEntry(target);
-      if (!actor) return;
+  return createContextOption({
+    key: "SPN.Directory.Context.Hide",
+    icon: "fa-eye-slash",
+    run: (actor) => {
       countFeature(MODULE_ID, 'actorTracking');
       void setActorTrackingMode(actor.uuid, TRACKING_MODES.HIDDEN).then(() => refreshOpenApps());
     }
-  };
+  });
 }
 
 // A labeled button below "Create Actor" opens the dashboard, so the module has an entry point that does not
@@ -253,10 +264,7 @@ function getTokenIndicatorState(token) {
 function drawTokenBadge(container, state) {
   const style = TOKEN_INDICATOR_STYLES[state];
   const badge = new PIXI.Graphics();
-  badge.beginFill(style.fill, 0.95);
-  badge.lineStyle(1, 0x111111, 0.9);
-  badge.drawCircle(0, 0, 11);
-  badge.endFill();
+  drawBadgeCircle(badge, { fill: style.fill, fillAlpha: 0.95, lineColor: 0x111111, lineAlpha: 0.9, lineWidth: 1, radius: BADGE_RADIUS });
 
   const TextClass = foundry?.canvas?.containers?.PreciseText ?? globalThis.PIXI?.Text;
   const text = new TextClass(style.label, {
@@ -304,7 +312,7 @@ function updateTokenIndicator(token) {
 
 // The Token HUD element is a <form>, see resolveElement.
 function injectTokenHudButton(app, html, data) {
-  if (!isGM() || !getSetting(SETTINGS.TOKEN_INDICATORS, true)) return;
+  if (!isGM() || !getSetting(SETTINGS.TOKEN_HUD_BUTTON, true)) return;
   const actor = app?.actor ?? app?.object?.actor ?? canvas?.tokens?.get(data?._id)?.actor;
   if (!actor) return;
 
@@ -326,39 +334,28 @@ function injectTokenHudButton(app, html, data) {
   left.append(button);
 }
 
-function injectActorSheetHeaderLink(app, html) {
-  if (!isGM() || !getSetting(SETTINGS.ACTOR_SHEET_BUTTONS, true)) return;
-  const actor = getActorFromSheet(app);
-  if (!actor) return;
-
-  const contentRoot = resolveElement(html);
-  const appElement = resolveElement(app?.element);
-  const windowRoot = appElement?.querySelector?.('.window-header') ? appElement : contentRoot?.closest?.('.window-app, .application') ?? contentRoot;
-  const header = windowRoot?.querySelector?.('.window-header');
-  if (!header || header.querySelector('.spn-actor-sheet-link, .spn-open-actor-notes')) return;
-
+// The open notes of the actor, as the label of the sheet's header entry.
+function getHeaderEntryLabel(actor) {
   const openCount = getActorNotes(actor).filter((note) => note.status === NOTE_STATUSES.OPEN).length;
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'header-control spn-actor-sheet-link';
-  button.setAttribute('aria-label', localize('SPN.Tooltip.ActorHeaderNotes'));
-  button.title = localize('SPN.Tooltip.ActorHeaderNotes');
-  button.dataset.tooltip = localize('SPN.Tooltip.ActorHeaderNotes');
-  button.innerHTML = `<i class="fa-solid fa-note-sticky"></i><span>${foundry.utils.escapeHTML(localize('SPN.Button.OpenShort'))} (${openCount})</span>`;
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    void openActorNotes(actor);
-  });
-
-  const closeButton = header.querySelector('[data-action="close"]');
-  if (closeButton) header.insertBefore(button, closeButton);
-  else header.append(button);
+  return `${localize('SPN.Button.OpenShort')} (${openCount})`;
 }
 
-function scheduleActorSheetHeaderLink(app, html) {
-  injectActorSheetHeaderLink(app, html);
-  window.setTimeout(() => injectActorSheetHeaderLink(app, html), 50);
+// ApplicationV2 sheets (every sheet of v13 and v14 core and of dnd5e, PF2e, SWADE and Crucible): an entry in the
+// window's controls menu. Only sheets of an Actor document get it, not the notes windows of this module.
+function addActorSheetHeaderControl(app, controls) {
+  if (!isGM() || !getSetting(SETTINGS.ACTOR_SHEET_BUTTONS, true)) return;
+  const actor = app?.document?.documentName === 'Actor' ? app.document : null;
+  if (!actor) return;
+  if (controls.some((control) => control.action === HEADER_CONTROL_ACTION)) return;
+  controls.unshift({
+    action: HEADER_CONTROL_ACTION,
+    icon: 'fa-solid fa-note-sticky',
+    label: getHeaderEntryLabel(actor),
+    visible: () => isGM() && getSetting(SETTINGS.ACTOR_SHEET_BUTTONS, true),
+    onClick: () => {
+      void openActorNotes(actor);
+    }
+  });
 }
 
 function registerKeybinding(action, data) {
@@ -403,13 +400,17 @@ Hooks.once('init', () => {
     settings: [SETTINGS.DEFAULT_DASHBOARD_VIEW, SETTINGS.TOKEN_INDICATORS, SETTINGS.SESSION_REMINDER_POPUP]
   });
 
+  // Sheets of Foundry's current window system get a control entry, see addActorSheetHeaderControl.
+  Hooks.on('getHeaderControlsApplicationV2', addActorSheetHeaderControl);
+
+  // Actor sheets of the old window system (Foundry 13, a game system that has not moved on) only know this hook.
+  // ApplicationV2 sheets never call it.
   Hooks.on('getActorSheetHeaderButtons', (app, buttons) => {
     if (!isGM() || !getSetting(SETTINGS.ACTOR_SHEET_BUTTONS, true)) return;
     const actor = getActorFromSheet(app);
     if (!actor) return;
-    const openCount = getActorNotes(actor).filter((note) => note.status === NOTE_STATUSES.OPEN).length;
     buttons.unshift({
-      label: `${localize('SPN.Button.OpenShort')} (${openCount})`,
+      label: getHeaderEntryLabel(actor),
       class: 'spn-open-actor-notes',
       icon: 'fa-solid fa-note-sticky',
       tooltip: localize('SPN.Tooltip.ActorHeaderNotes'),
@@ -427,8 +428,6 @@ Hooks.once('init', () => {
     options.push(createActorDirectoryContextOption(), createTrackContextOption(), createHideContextOption());
   });
 
-  Hooks.on('renderActorSheet', scheduleActorSheetHeaderLink);
-  Hooks.on('renderActorSheetV2', scheduleActorSheetHeaderLink);
   Hooks.on('renderActorDirectory', (app, html) => {
     injectActorDirectoryButton(app, html);
     injectActorDirectoryIndicators(app, html);
@@ -530,6 +529,7 @@ Hooks.once('ready', async () => {
     };
   }
   noticeNewVersions();
+  await migrateHudButtonSetting();
 
   await showSessionReminderPopup();
   canvas?.tokens?.placeables?.forEach((token) => updateTokenIndicator(token));

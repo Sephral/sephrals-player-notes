@@ -398,17 +398,6 @@ body.theme-light .application:not(.themed) :is(.spn-app, .spn-dialog),
   margin-left: 0.4rem;
 }
 
-.spn-actor-sheet-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  white-space: nowrap;
-}
-
-.spn-actor-sheet-link span {
-  font-size: 0.85em;
-}
-
 .spn-token-indicator {
   pointer-events: none;
 }

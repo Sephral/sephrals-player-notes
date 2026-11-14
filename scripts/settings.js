@@ -75,6 +75,15 @@ export function registerSettings() {
     hint: game.i18n.localize("SPN.Settings.TokenIndicators.Hint")
   });
 
+  game.settings.register(MODULE_ID, SETTINGS.TOKEN_HUD_BUTTON, {
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    name: game.i18n.localize("SPN.Settings.TokenHudButton.Name"),
+    hint: game.i18n.localize("SPN.Settings.TokenHudButton.Hint")
+  });
+
   game.settings.register(MODULE_ID, SETTINGS.ACTOR_SHEET_BUTTONS, {
     scope: "world",
     config: true,
@@ -204,6 +213,26 @@ export function registerSettings() {
     label: game.i18n.localize("SPN.Debug.Save"),
     hint: game.i18n.localize("SPN.Debug.Hint")
   });
+}
+
+// Until 1.0.7 the Token HUD button hung on the token indicators setting. A world that had switched the indicators off
+// keeps the button off: the new setting starts with the old choice, once, when nobody has stored a value for it yet.
+export function hudButtonStartValue(indicatorsStored, hudStored) {
+  if (hudStored !== undefined) return undefined;
+  return indicatorsStored === false ? false : undefined;
+}
+
+export async function migrateHudButtonSetting() {
+  if (!game.user?.isActiveGM) return;
+  try {
+    const store = game.settings.storage?.get?.("world");
+    const stored = (key) => store?.getSetting?.(`${MODULE_ID}.${key}`)?.value;
+    const parse = (raw) => (raw === undefined ? undefined : JSON.parse(raw));
+    const start = hudButtonStartValue(parse(stored(SETTINGS.TOKEN_INDICATORS)), parse(stored(SETTINGS.TOKEN_HUD_BUTTON)));
+    if (start !== undefined) await game.settings.set(MODULE_ID, SETTINGS.TOKEN_HUD_BUTTON, start);
+  } catch (error) {
+    console.warn(`${MODULE_ID} | Could not carry the token indicators choice over to the HUD button setting`, error);
+  }
 }
 
 export function getSetting(key, fallback = null) {
