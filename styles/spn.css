@@ -526,3 +526,9 @@ body.theme-light .application:not(.themed):has(.spn-dialog--export) .dialog-butt
     grid-template-columns: 1fr;
   }
 }
+
+.chat-message.spn-message-flash {
+  outline: 2px solid var(--color-warm-2, #ff6400);
+  outline-offset: 2px;
+  transition: outline-color 0.4s ease;
+}

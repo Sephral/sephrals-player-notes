@@ -7,6 +7,7 @@ import {
   TRACKING_MODES
 } from "./constants.js";
 import { PlayerActorNotesApp } from "./actor-notes-app.js";
+import { activateMessageLinks, registerChatContextEntry } from "./chat-note.js";
 import { registerDebug } from "./debug.js";
 import { saveDebugFile } from "./debug-file.mjs";
 import { registerHubModule } from "./hub.mjs";
@@ -396,9 +397,12 @@ Hooks.once('init', () => {
   registerDebug();
   setOpenDashboardHandler(openDashboard);
   registerUsage(MODULE_ID, {
-    features: ['noteCreate', 'noteEdit', 'noteResolve', 'noteArchive', 'quickNote', 'notesExport', 'notesImport', 'actorTracking'],
+    features: ['noteCreate', 'noteEdit', 'noteResolve', 'noteArchive', 'quickNote', 'notesExport', 'notesImport', 'actorTracking', 'noteFromChat'],
     settings: [SETTINGS.DEFAULT_DASHBOARD_VIEW, SETTINGS.TOKEN_INDICATORS, SETTINGS.SESSION_REMINDER_POPUP]
   });
+
+  // GM entry in the context menu of a chat message: a note on the speaker's character, prefilled with the message.
+  registerChatContextEntry();
 
   // Sheets of Foundry's current window system get a control entry, see addActorSheetHeaderControl.
   Hooks.on('getHeaderControlsApplicationV2', addActorSheetHeaderControl);
@@ -512,6 +516,7 @@ Hooks.once('init', () => {
 
 Hooks.once('ready', async () => {
   await loadModuleTranslations();
+  if (isGM()) activateMessageLinks();
   const module = game.modules.get(MODULE_ID);
   if (module) {
     module.api = {

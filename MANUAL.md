@@ -21,6 +21,7 @@ It is intentionally not a generic note module for every document type, and it do
 * Open the dashboard with the Player Notes button in the Actor Directory, the Player Notes tool in the token controls, the shortcut Ctrl+Shift+N or the button in the module settings
 * Open Player Notes from the window menu (the three dots) of an actor sheet, the entry shows the number of open notes
 * Open Player Notes from the context menu of the Actor Directory
+* Make a note from a chat message: the context menu entry *Note for the Character* (GM only), see [Note from a chat message](#note-from-a-chat-message)
 * Optionally open Player Notes from the Token HUD (setting *Token HUD button*)
 * Write a quick note for the selected token with the Quick Player Note tool in the token controls
 * Use the global Player Notes Dashboard to review all tracked campaign notes
@@ -50,6 +51,10 @@ It is intentionally not a generic note module for every document type, and it do
 * *Save debug file* in the module settings saves a file for bug reports, see [Debug file](#debug-file)
 
 Note text supports Foundry links and readable formatting. Token indicators are intentionally lightweight and only visible to the GM.
+
+## Note from a chat message
+
+Right click a chat message and choose *Note for the Character*. The module takes the character the message belongs to: the speaker's actor, else the actor of the speaker's token, else the character the sending player plays. When none of them exists, a small window asks which character the note is for and offers the characters that a player owns. Then the note editor opens with the text of the message (without markup, lines kept, trimmed) and a link to the message below it. The title is the first line. Nothing is saved until you press *Save*, so you can change everything first. A click on the link in the note scrolls to the message in the chat log and lets it flash. A message that is no longer in the log is said so. Cards without text, such as a roll, give only the link and a title with the speaker's name.
 
 ## Privacy
 
@@ -89,7 +94,7 @@ The module can take part in a small usage report shared by all of Sephral’s mo
 With the GM’s consent only the active GM’s browser counts, and it sends at most one report a day. The counts are kept in a hidden world setting, so all browsers and computers of the GM count together, and turning the statistics off deletes them. A copy of a world gets its own world ID. The question lists everything the report contains, from the Foundry version to a random world ID. For Player Notes it holds:
 
 * on how many of the last 30 days the module was used
-* how often notes are created, edited, resolved or archived, quick notes are taken for selected tokens, notes are exported or imported and characters are added to or hidden from the tracking
+* how often notes are created, edited, resolved or archived, quick notes are taken for selected tokens, notes are made from a chat message, notes are exported or imported and characters are added to or hidden from the tracking
 * the settings *Default dashboard view*, *Token indicators* and *Session reminder popup* (only the chosen option)
 * where errors occur in the module code: file, line, error type and whether the error arose in the module itself, in Foundry, in the game system or in another module, never the error message or the name of another module
 

@@ -194,5 +194,14 @@
   "SPN.Debug.Save": "Save debug file",
   "SPN.Debug.Hint": "Saves one file for bug reports about all of Sephral’s modules in this world: versions, settings and what the modules recorded, such as the latest chat messages they read. It contains chat text and whispers, check it before you share it.",
   "SPN.Debug.Entry": "Save Debug File (Sephral’s Modules)",
-  "SPN.Debug.Saved": "Debug file {file} saved. It contains chat text and whispers, check it before you share it."
+  "SPN.Debug.Saved": "Debug file {file} saved. It contains chat text and whispers, check it before you share it.",
+  "SPN.ChatNote.Entry": "Note for the Character",
+  "SPN.ChatNote.LinkLabel": "Chat message",
+  "SPN.ChatNote.FallbackTitle": "Message from {name}",
+  "SPN.ChatNote.ChooseTitle": "Which character is the note for?",
+  "SPN.ChatNote.ChooseLabel": "Character",
+  "SPN.ChatNote.ChooseConfirm": "Continue",
+  "SPN.ChatNote.NoCharacter": "This message has no character and the world has no actors to choose from.",
+  "SPN.ChatNote.Saved": "Note saved for {name}.",
+  "SPN.ChatNote.NotShown": "That chat message is no longer in the chat log."
 }

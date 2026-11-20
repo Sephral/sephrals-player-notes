@@ -194,5 +194,14 @@
   "SPN.Debug.Save": "Debug-Datei speichern",
   "SPN.Debug.Hint": "Speichert eine Datei für Fehlerberichte über alle Module von Sephral in dieser Welt: Versionen, Einstellungen und was die Module aufgezeichnet haben, etwa die letzten Chatnachrichten, die sie gelesen haben. Sie enthält Chattext und Flüsternachrichten, prüfe sie vor dem Teilen.",
   "SPN.Debug.Entry": "Debug-Datei speichern (Sephral’s Module)",
-  "SPN.Debug.Saved": "Debug-Datei {file} gespeichert. Sie enthält Chattext und Flüsternachrichten, prüfe sie vor dem Teilen."
+  "SPN.Debug.Saved": "Debug-Datei {file} gespeichert. Sie enthält Chattext und Flüsternachrichten, prüfe sie vor dem Teilen.",
+  "SPN.ChatNote.Entry": "Notiz für den Charakter",
+  "SPN.ChatNote.LinkLabel": "Chatnachricht",
+  "SPN.ChatNote.FallbackTitle": "Nachricht von {name}",
+  "SPN.ChatNote.ChooseTitle": "Für welchen Charakter ist die Notiz?",
+  "SPN.ChatNote.ChooseLabel": "Charakter",
+  "SPN.ChatNote.ChooseConfirm": "Weiter",
+  "SPN.ChatNote.NoCharacter": "Zu dieser Nachricht gibt es keinen Charakter und die Welt hat keine Akteure zur Auswahl.",
+  "SPN.ChatNote.Saved": "Notiz für {name} gespeichert.",
+  "SPN.ChatNote.NotShown": "Diese Chatnachricht steht nicht mehr im Chatverlauf."
 }

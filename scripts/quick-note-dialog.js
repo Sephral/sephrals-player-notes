@@ -49,7 +49,7 @@ function renderEditorMetadata(note) {
   return `<p class="spn-muted spn-dialog__metadata">${foundry.utils.escapeHTML(created)}<br>${foundry.utils.escapeHTML(updated)}</p>`;
 }
 
-export async function promptNoteEditor({ actor, note = null, quick = false } = {}) {
+export async function promptNoteEditor({ actor, note = null, quick = false, prefill = null } = {}) {
   if (!actor) return null;
   const customTags = await getAvailableTags();
   const knownTagLabels = tagOptions(customTags).map((entry) => entry.label);
@@ -59,7 +59,8 @@ export async function promptNoteEditor({ actor, note = null, quick = false } = {
     tags: [],
     status: NOTE_STATUSES.OPEN,
     priority: NOTE_PRIORITIES.NORMAL,
-    visibility: NOTE_VISIBILITY.GM_ONLY
+    visibility: NOTE_VISIBILITY.GM_ONLY,
+    ...(prefill ?? {})
   };
 
   const content = `
