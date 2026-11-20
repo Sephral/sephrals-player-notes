@@ -11,7 +11,7 @@
 ## Highlights
 
 * **Notes where they belong:** private GM notes on every player character, one click away from the sheet, the actor directory or the token HUD.
-* **Straight from the chat:** right click a message and turn it into a note for the character, with the text and a link back.
+* **Straight from the chat:** right click a message and turn it into a note for the character, with the text and a link back that opens the note right away.
 * **Made for campaign memory:** story hooks, secrets, promises, debts, unresolved scenes and spotlight reminders.
 * **Know what is due:** statuses like *Open* and *Next Session*, priorities from *Low* to *Urgent* and tags of your own.
 * **One dashboard for the whole party:** filter by character, status, tag or priority, or switch to the session prep view before game night.
