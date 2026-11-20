@@ -198,10 +198,13 @@ export function openMessageLink(uuid) {
 }
 
 export function activateMessageLinks() {
-  document.body.addEventListener("click", (event) => {
+  // In the capture phase on the document, so the click never reaches the core content link handler on the body, which
+  // would open an empty sheet of the chat message next to the jump.
+  document.addEventListener("click", (event) => {
     const link = event.target?.closest?.("a[data-link][data-uuid^='ChatMessage.']");
     if (!link) return;
     event.preventDefault();
+    event.stopPropagation();
     openMessageLink(link.dataset.uuid);
-  });
+  }, true);
 }
