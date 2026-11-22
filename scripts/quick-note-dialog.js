@@ -49,21 +49,9 @@ function renderEditorMetadata(note) {
   return `<p class="spn-muted spn-dialog__metadata">${foundry.utils.escapeHTML(created)}<br>${foundry.utils.escapeHTML(updated)}</p>`;
 }
 
-export async function promptNoteEditor({ actor, note = null, quick = false, prefill = null } = {}) {
-  if (!actor) return null;
-  const customTags = await getAvailableTags();
-  const knownTagLabels = tagOptions(customTags).map((entry) => entry.label);
-  const initial = note ?? {
-    title: "",
-    body: "",
-    tags: [],
-    status: NOTE_STATUSES.OPEN,
-    priority: NOTE_PRIORITIES.NORMAL,
-    visibility: NOTE_VISIBILITY.GM_ONLY,
-    ...(prefill ?? {})
-  };
-
-  const content = `
+/** The form of the note editor (also shown by the sample windows). */
+export function editorContent({ actor, note = null, initial, knownTagLabels = [] }) {
+  return `
     <div class="spn-dialog">
       <p class="spn-muted">${actor.name}</p>
       ${renderEditorMetadata(note)}
@@ -90,6 +78,23 @@ export async function promptNoteEditor({ actor, note = null, quick = false, pref
         <textarea name="body" placeholder="@UUID[...]">${foundry.utils.escapeHTML(initial.body ?? "")}</textarea>
       </label>
     </div>`;
+}
+
+export async function promptNoteEditor({ actor, note = null, quick = false, prefill = null } = {}) {
+  if (!actor) return null;
+  const customTags = await getAvailableTags();
+  const knownTagLabels = tagOptions(customTags).map((entry) => entry.label);
+  const initial = note ?? {
+    title: "",
+    body: "",
+    tags: [],
+    status: NOTE_STATUSES.OPEN,
+    priority: NOTE_PRIORITIES.NORMAL,
+    visibility: NOTE_VISIBILITY.GM_ONLY,
+    ...(prefill ?? {})
+  };
+
+  const content = editorContent({ actor, note, initial, knownTagLabels });
 
   const response = await foundry.applications.api.DialogV2.wait({
     window: {

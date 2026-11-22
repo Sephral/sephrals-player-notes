@@ -91,15 +91,20 @@ export function candidateActors() {
   return (owned.length ? owned : actors).slice().sort((a, b) => String(a.name).localeCompare(String(b.name)));
 }
 
-async function askForActor(candidates, preselected) {
+/** The question which character a note is for (also shown by the sample windows). */
+export function chooseActorContent(candidates, preselected) {
   const options = candidates.map((actor) => `<option value="${escapeHtml(actor.id)}"${actor.id === preselected?.id ? " selected" : ""}>${escapeHtml(actor.name)}</option>`).join("");
-  const content = `
+  return `
     <div class="spn-dialog">
       <label>
         <span>${escapeHtml(localize("SPN.ChatNote.ChooseLabel"))}</span>
         <select name="actorId">${options}</select>
       </label>
     </div>`;
+}
+
+async function askForActor(candidates, preselected) {
+  const content = chooseActorContent(candidates, preselected);
   const id = await foundry.applications.api.DialogV2.wait({
     window: { title: localize("SPN.ChatNote.ChooseTitle") },
     content,

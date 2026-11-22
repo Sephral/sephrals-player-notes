@@ -117,6 +117,7 @@ GMs can work with notes from macros or other modules through `game.modules.get("
 | `updateNote(actor, noteId, changes)` | Changes the same fields as `createNote`. Returns the updated note, or `null` if the actor has no note with that id. |
 | `runSelfTest()` | Runs the self test and returns the problems it found. |
 | `saveDebugFile()` | Saves the debug file, see [Debug file](#debug-file). |
+| `samples()` | Lists sample windows (dashboard, notes window, dialogs, buttons and badges) filled with made-up notes, each with an `open()` that shows it. Nothing is saved, so translators and testers see every text without writing notes first. |
 
 Valid statuses are `open`, `next-session`, `resolved` and `archived`. Valid priorities are `low`, `normal`, `high` and `urgent`. Visibility is `gm-only` or `player-visible`. Other values throw an error.
 

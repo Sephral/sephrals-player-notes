@@ -40,6 +40,8 @@ import {
   resolveElement
 } from "./utils.js";
 import { countFeature, markUsed, registerUsage } from "./usage.mjs";
+import { createDirectoryButtonRow, createDirectoryIndicator, createHudButton, headerEntryLabelFor, reminderContent, TOKEN_INDICATOR_STYLES } from "./entry-points.js";
+import { sampleWindows } from "./sample-windows.js";
 
 let dashboardApp = null;
 const actorApps = new Map();
@@ -48,10 +50,6 @@ const QUICK_NOTE_TOOL = 'spnQuickNote';
 const DASHBOARD_TOOL = 'spnDashboard';
 const HEADER_CONTROL_ACTION = 'spnOpenNotes';
 const REFRESH_DEBOUNCE_MS = 150;
-const TOKEN_INDICATOR_STYLES = Object.freeze({
-  urgent: { fill: 0xb93d46, label: '!' },
-  nextSession: { fill: 0xd06a4a, label: 'N' }
-});
 
 function getActorFromSheet(app) {
   return app?.actor ?? app?.document ?? null;
@@ -214,18 +212,7 @@ function injectActorDirectoryButton(app, html) {
   const header = root?.querySelector('.directory-header');
   if (!header || header.querySelector('.spn-directory-actions')) return;
 
-  const row = document.createElement('div');
-  row.className = 'header-actions action-buttons flexrow spn-directory-actions';
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'spn-directory-button';
-  button.dataset.tooltip = localize('SPN.Tooltip.OpenDashboard');
-  button.innerHTML = `<i class="fa-solid fa-note-sticky" inert></i><span>${foundry.utils.escapeHTML(localize('SPN.Directory.Button'))}</span>`;
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    void openDashboard();
-  });
-  row.append(button);
+  const row = createDirectoryButtonRow(() => void openDashboard());
 
   const actions = header.querySelector('.header-actions');
   if (actions) actions.after(row);
@@ -245,9 +232,7 @@ function injectActorDirectoryIndicators(app, html) {
     entry.querySelectorAll('.spn-dir-indicator').forEach((node) => node.remove());
     if (!summary.hasVisibleIndicator) return;
 
-    const label = document.createElement('span');
-    label.className = 'spn-dir-indicator spn-badge';
-    label.textContent = String(summary.counts.nextSession || summary.counts.open);
+    const label = createDirectoryIndicator(summary.counts.nextSession || summary.counts.open);
     const heading = entry.querySelector('.entry-name, h3, .document-name') ?? entry;
     heading.append(label);
   });
@@ -322,23 +307,14 @@ function injectTokenHudButton(app, html, data) {
   const left = root.querySelector('.col.left') ?? root;
   if (left.querySelector('.spn-hud-button')) return;
 
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.className = 'control-icon spn-hud-button';
-  button.innerHTML = '<i class="fa-solid fa-note-sticky" inert></i>';
-  button.dataset.tooltip = localize('SPN.Directory.Context.Open');
-  button.setAttribute('aria-label', localize('SPN.Directory.Context.Open'));
-  button.addEventListener('click', (event) => {
-    event.preventDefault();
-    void openActorNotes(actor);
-  });
+  const button = createHudButton(() => void openActorNotes(actor));
   left.append(button);
 }
 
 // The open notes of the actor, as the label of the sheet's header entry.
 function getHeaderEntryLabel(actor) {
   const openCount = getActorNotes(actor).filter((note) => note.status === NOTE_STATUSES.OPEN).length;
-  return `${localize('SPN.Button.OpenShort')} (${openCount})`;
+  return headerEntryLabelFor(openCount);
 }
 
 // ApplicationV2 sheets (every sheet of v13 and v14 core and of dnd5e, PF2e, SWADE and Crucible): an entry in the
@@ -375,10 +351,7 @@ async function showSessionReminderPopup() {
   const notes = summaries.flatMap((summary) => summary.filteredNotes.map((note) => ({ actorName: summary.actorName, title: note.title })));
   if (!notes.length) return;
 
-  const content = `
-    <div class="spn-dialog">
-      <ul>${notes.map((note) => `<li><strong>${foundry.utils.escapeHTML(note.actorName)}</strong>: ${foundry.utils.escapeHTML(note.title)}</li>`).join('')}</ul>
-    </div>`;
+  const content = reminderContent(notes);
 
   await foundry.applications.api.DialogV2.prompt({
     window: { title: localize('SPN.Dialog.Popup.Title'), resizable: true },
@@ -529,6 +502,8 @@ Hooks.once('ready', async () => {
       getNotes,
       updateNote,
       runSelfTest,
+      // The windows filled with made-up notes, nothing saved (translators, testing)
+      samples: () => sampleWindows(),
       // One file for all of Sephral's modules, without a message id about their latest picture
       saveDebugFile: (messageId) => saveDebugFile(messageId ?? null, { moduleId: MODULE_ID })
     };

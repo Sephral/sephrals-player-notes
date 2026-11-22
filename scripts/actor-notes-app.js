@@ -125,7 +125,7 @@ export class PlayerActorNotesApp extends foundry.applications.api.ApplicationV2 
 
   async _onRender(context, options) {
     await super._onRender(context, options);
-    observeApplicationGeometry(this, "actorNotes");
+    if (!this.isSample) observeApplicationGeometry(this, "actorNotes");
     this.#bindListeners();
   }
 

@@ -119,8 +119,8 @@ export async function exportNotesJson(options = {}) {
   return payload;
 }
 
-export async function exportSessionPrepMarkdown({ actorUuids = null } = {}) {
-  const summaries = await getTrackedActorSummaries({ actorFilter: "all", prepOnly: true, hideArchived: true });
+/** The session prep text as Markdown, from summaries of tracked actors (also shown by the sample windows). */
+export function buildPrepMarkdown(summaries, actorUuids = null) {
   const selectedSet = actorUuids ? new Set(actorUuids) : null;
   const lines = [
     `# ${format("SPN.Export.MarkdownTitle", { world: game.world?.title ?? "World" })}`,
@@ -153,7 +153,12 @@ export async function exportSessionPrepMarkdown({ actorUuids = null } = {}) {
     lines.push("");
   }
 
-  const markdown = lines.join("\n");
+  return lines.join("\n");
+}
+
+export async function exportSessionPrepMarkdown({ actorUuids = null } = {}) {
+  const summaries = await getTrackedActorSummaries({ actorFilter: "all", prepOnly: true, hideArchived: true });
+  const markdown = buildPrepMarkdown(summaries, actorUuids);
   downloadData(exportFilename("md"), markdown, "text/markdown");
   return markdown;
 }
@@ -172,15 +177,15 @@ function renderOptions(options) {
   return options.map((option) => `<option value="${option.value}" ${option.selected ? "selected" : ""}>${option.label}</option>`).join("");
 }
 
-export async function promptExportNotes(filteredActorUuids = null) {
-  const summaries = await getTrackedActorSummaries();
+/** The form of the export window (also shown by the sample windows). */
+export function exportDialogContent(summaries) {
   const actorChecklist = summaries.map((summary) => `
     <label class="spn-check-row">
       <input type="checkbox" name="actorUuid" value="${summary.actorUuid}">
       <span>${foundry.utils.escapeHTML(summary.actorName)}</span>
     </label>`).join("");
 
-  const content = `
+  return `
     <div class="spn-dialog spn-dialog--export">
       <div class="spn-dialog__grid">
         <label>
@@ -201,6 +206,11 @@ export async function promptExportNotes(filteredActorUuids = null) {
         <div class="spn-export-actor-list">${actorChecklist}</div>
       </fieldset>
     </div>`;
+}
+
+export async function promptExportNotes(filteredActorUuids = null) {
+  const summaries = await getTrackedActorSummaries();
+  const content = exportDialogContent(summaries);
 
   const response = await foundry.applications.api.DialogV2.wait({
     window: { title: localize("SPN.Dialog.Export.Title"), resizable: true },
@@ -253,16 +263,21 @@ export async function promptExportNotes(filteredActorUuids = null) {
   return exportNotesJson({ actorUuids, statusFilter: response.statusFilter });
 }
 
-async function pickImportText() {
-  return foundry.applications.api.DialogV2.prompt({
-    window: { title: localize("SPN.Dialog.Import.Title"), resizable: true },
-    content: `
+/** The form that asks for the file to import (also shown by the sample windows). */
+export function importFileContent() {
+  return `
       <div class="spn-dialog">
         <label>
           <span>${localize("SPN.Dialog.Import.Title")}</span>
           <input type="file" name="payload" accept="application/json,.json" autofocus>
         </label>
-      </div>`,
+      </div>`;
+}
+
+async function pickImportText() {
+  return foundry.applications.api.DialogV2.prompt({
+    window: { title: localize("SPN.Dialog.Import.Title"), resizable: true },
+    content: importFileContent(),
     ok: {
       label: localize("SPN.Button.Import"),
       callback: async (_event, button) => {
@@ -330,8 +345,9 @@ export function previewImportPayload(payload) {
   };
 }
 
-async function promptImportPreview(preview) {
-  const actorOptions = (game?.actors?.contents ?? [])
+/** The import preview (also shown by the sample windows). actors: {uuid, name}[] the notes can be mapped to. */
+export function importPreviewContent(preview, actors) {
+  const actorOptions = actors
     .map((actor) => `<option value="${actor.uuid}">${foundry.utils.escapeHTML(actor.name)}</option>`)
     .join("");
 
@@ -346,7 +362,7 @@ async function promptImportPreview(preview) {
       </label>`).join("")
     : `<p class="spn-muted">${localize("SPN.Dialog.Popup.Empty")}</p>`;
 
-  const content = `
+  return `
     <div class="spn-dialog spn-import-preview">
       <section>
         <strong>${localize("SPN.Import.Metadata")}</strong>
@@ -374,6 +390,10 @@ async function promptImportPreview(preview) {
       </fieldset>
       <p class="spn-muted">${localize("SPN.Import.Warning")}</p>
     </div>`;
+}
+
+async function promptImportPreview(preview) {
+  const content = importPreviewContent(preview, game?.actors?.contents ?? []);
 
   return foundry.applications.api.DialogV2.wait({
     window: { title: localize("SPN.Dialog.Import.PreviewTitle"), resizable: true },
@@ -499,9 +519,9 @@ export async function promptImportNotes() {
   return preview;
 }
 
-export async function openOrphanCleanupDialog() {
-  const orphans = getOrphanedNotes();
-  const actorOptions = (game?.actors?.contents ?? []).map((actor) => `<option value="${actor.uuid}">${foundry.utils.escapeHTML(actor.name)}</option>`).join("");
+/** The orphan cleanup window (also shown by the sample windows). */
+export function orphanDialogContent(orphans, actors) {
+  const actorOptions = actors.map((actor) => `<option value="${actor.uuid}">${foundry.utils.escapeHTML(actor.name)}</option>`).join("");
   const rows = orphans.length
     ? orphans.map((entry) => `
       <label>
@@ -510,9 +530,7 @@ export async function openOrphanCleanupDialog() {
       </label>`).join("")
     : `<p class="spn-muted">${localize("SPN.Label.NoNotes")}</p>`;
 
-  const response = await foundry.applications.api.DialogV2.wait({
-    window: { title: localize("SPN.Dialog.Orphans.Title"), resizable: true },
-    content: `
+  return `
       <div class="spn-dialog spn-orphans">
         <div class="spn-dialog__grid">${rows}</div>
         <label>
@@ -522,7 +540,15 @@ export async function openOrphanCleanupDialog() {
             ${actorOptions}
           </select>
         </label>
-      </div>`,
+      </div>`;
+}
+
+export async function openOrphanCleanupDialog() {
+  const orphans = getOrphanedNotes();
+
+  const response = await foundry.applications.api.DialogV2.wait({
+    window: { title: localize("SPN.Dialog.Orphans.Title"), resizable: true },
+    content: orphanDialogContent(orphans, game?.actors?.contents ?? []),
     buttons: [
       {
         action: "remap",

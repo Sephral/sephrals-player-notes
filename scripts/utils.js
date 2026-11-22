@@ -150,6 +150,11 @@ export function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+/** Escapes with Foundry's own helper (a Node test without Foundry falls back to escapeHtml). */
+export function foundryEscape(value) {
+  return globalThis.foundry?.utils?.escapeHTML?.(String(value ?? "")) ?? escapeHtml(value);
+}
+
 export function normalizeText(value) {
   return String(value ?? "").trim().toLowerCase();
 }

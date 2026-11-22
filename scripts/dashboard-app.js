@@ -64,11 +64,20 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
     this.expandedBodyKeys = new Set();
   }
 
+  // Where the notes come from: the world (nothing to add) or, in a sample window, made-up actors held in memory.
+  dataSource() {
+    return {};
+  }
+
+  orphanTotal() {
+    return getOrphanedNotes().length;
+  }
+
   async _prepareContext(_options) {
     const viewMode = normalizeDashboardView(this.filters.viewMode);
     this.filters.viewMode = viewMode;
     const prepOnly = viewMode === DASHBOARD_VIEWS.PREP;
-    const filterState = { ...this.filters, prepOnly, expandedBodyKeys: this.expandedBodyKeys };
+    const filterState = { ...this.filters, prepOnly, expandedBodyKeys: this.expandedBodyKeys, ...this.dataSource() };
     const groupedActors = await getPreparedDashboardGroups(filterState);
     const flatNotes = await getPreparedFlatNotes(filterState);
     const recoverySummaries = (await getActorRecoverySummaries(filterState)).sort((left, right) => {
@@ -83,7 +92,7 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
       compactMode: viewMode === DASHBOARD_VIEWS.COMPACT,
       prepMode: prepOnly,
       filters: this.filters,
-      orphanCount: getOrphanedNotes().length,
+      orphanCount: this.orphanTotal(),
       recoveryActorSummaries: recoverySummaries.map((entry) => ({
         actorUuid: entry.actorUuid,
         actorName: entry.actorName,
@@ -141,7 +150,7 @@ export class PlayerNotesDashboardApp extends foundry.applications.api.Applicatio
 
   async _onRender(context, options) {
     await super._onRender(context, options);
-    observeApplicationGeometry(this, "dashboard");
+    if (!this.isSample) observeApplicationGeometry(this, "dashboard");
     this.#bindListeners();
   }
 

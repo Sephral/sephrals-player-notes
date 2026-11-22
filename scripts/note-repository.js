@@ -190,8 +190,9 @@ export function summarizeActor(actor) {
 }
 
 export async function getTrackedActorSummaries(filters = {}) {
-  const state = await getWorldState();
-  const actors = game?.actors?.contents ?? [];
+  // Sample windows hand in made-up actors and a world state of their own (filters.actors, filters.worldState)
+  const state = filters.worldState ?? await getWorldState();
+  const actors = filters.actors ?? game?.actors?.contents ?? [];
   const summaries = [];
 
   for (const actor of actors) {
